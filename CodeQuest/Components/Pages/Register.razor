@@ -1,0 +1,116 @@
+﻿@page "/register"
+
+@layout LoginLayout
+@using ScriptHaven.Components.Layout
+@using System.ComponentModel.DataAnnotations
+
+<div class="auth-shell">
+    <div class="web">
+        <div class="web-badge" aria-hidden="true">
+            <img src="/images/logo.png"
+                 alt="CodeQuest logo"
+                 class="logo-img" />
+        </div>
+        <span class="web-name">CodeQuest</span>
+    </div>
+
+    <h1 class="title">Create account</h1>
+    <p class="subtitle">Join us and start your journey</p>
+
+    <div class="card">
+        <EditForm Model="@model" OnValidSubmit="@OnRegister" class="form">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="validation" />
+
+            <div class="field">
+                <label class="label">Full Name</label>
+                <div class="input-row no-right">
+                    <span class="icon" aria-hidden="true">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                            <path d="M20 21a8 8 0 0 0-16 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                            <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" stroke="currentColor" stroke-width="2" />
+                        </svg>
+                    </span>
+                    <InputText class="input" @bind-Value="model.FullName" placeholder="John Doe" />
+                </div>
+                <ValidationMessage For="@(() => model.FullName)" class="field-error" />
+            </div>
+
+            <div class="field">
+                <label class="label">Email</label>
+                <div class="input-row no-right">
+                    <span class="icon" aria-hidden="true">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                            <path d="M4 6h16v12H4V6Z" stroke="currentColor" stroke-width="2" />
+                            <path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="2" />
+                        </svg>
+                    </span>
+                    <InputText class="input" @bind-Value="model.Email" placeholder="you@example.com" />
+                </div>
+                <ValidationMessage For="@(() => model.Email)" class="field-error" />
+            </div>
+
+            <div class="field">
+                <label class="label">Password</label>
+                <div class="input-row no-right">
+                    <span class="icon" aria-hidden="true">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                            <path d="M7 11V8a5 5 0 0 1 10 0v3" stroke="currentColor" stroke-width="2" />
+                            <path d="M6 11h12v10H6V11Z" stroke="currentColor" stroke-width="2" />
+                        </svg>
+                    </span>
+                    <InputText class="input" type="password" @bind-Value="model.Password" placeholder="••••••••" />
+                </div>
+                <ValidationMessage For="@(() => model.Password)" class="field-error" />
+            </div>
+
+            <div class="field">
+                <label class="label">Confirm Password</label>
+                <div class="input-row no-right">
+                    <span class="icon" aria-hidden="true">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                            <path d="M7 11V8a5 5 0 0 1 10 0v3" stroke="currentColor" stroke-width="2" />
+                            <path d="M6 11h12v10H6V11Z" stroke="currentColor" stroke-width="2" />
+                        </svg>
+                    </span>
+                    <InputText class="input" type="password" @bind-Value="model.ConfirmPassword" placeholder="••••••••" />
+                </div>
+                <ValidationMessage For="@(() => model.ConfirmPassword)" class="field-error" />
+            </div>
+
+            <button type="submit" class="btn">
+                Create account <span class="arrow" aria-hidden="true">→</span>
+            </button>
+
+            <div class="bottom">
+                <span>Already have an account?</span>
+                <a href="/login" class="link">Sign in</a>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private readonly RegisterModel model = new();
+
+    private Task OnRegister() => Task.CompletedTask;
+
+    public class RegisterModel
+    {
+        [System.ComponentModel.DataAnnotations.Required]
+        [System.ComponentModel.DataAnnotations.MinLength(2)]
+        public string FullName { get; set; } = "";
+
+        [System.ComponentModel.DataAnnotations.Required]
+        [System.ComponentModel.DataAnnotations.EmailAddress]
+        public string Email { get; set; } = "";
+
+        [System.ComponentModel.DataAnnotations.Required]
+        [System.ComponentModel.DataAnnotations.MinLength(6)]
+        public string Password { get; set; } = "";
+
+        [System.ComponentModel.DataAnnotations.Required]
+        [System.ComponentModel.DataAnnotations.MinLength(6)]
+        public string ConfirmPassword { get; set; } = "";
+    }
+}

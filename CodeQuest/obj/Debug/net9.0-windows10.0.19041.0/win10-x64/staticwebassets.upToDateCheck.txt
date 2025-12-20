@@ -1,0 +1,9 @@
+wwwroot\css\app.css
+wwwroot\css\bootstrap\bootstrap.min.css
+wwwroot\css\bootstrap\bootstrap.min.css.map
+wwwroot\Images\logo.png
+wwwroot\index.html
+C:\Users\user\Desktop\CodeQuest\CodeQuest\wwwroot\index.html
+C:\Users\user\Desktop\CodeQuest\CodeQuest\wwwroot\css\bootstrap\bootstrap.min.css.map
+C:\Users\user\Desktop\CodeQuest\CodeQuest\wwwroot\css\app.css
+C:\Users\user\Desktop\CodeQuest\CodeQuest\wwwroot\css\bootstrap\bootstrap.min.css
