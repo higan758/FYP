@@ -1,0 +1,6 @@
+@CodeQuest_HostAddress = http://localhost:5143
+
+GET {{CodeQuest_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
