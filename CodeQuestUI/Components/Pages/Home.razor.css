@@ -1,0 +1,43 @@
+﻿:host {
+    display: block;
+    min-height: 100vh;
+    background-image: url("/images/hero-bg.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+    :host::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: -1;
+    }
+
+
+.hero {
+    background: rgba(0, 0, 0, 0.45);
+    padding: 3rem 4rem;
+    border-radius: 12px;
+    max-width: 900px;
+}
+
+
+h1 {
+    font-size: 2.8rem;
+    color: white;
+    text-shadow: 0 3px 10px rgba(0,0,0,0.7);
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: #e5e7eb;
+    max-width: 600px;
+    margin-top: 0.5rem;
+}
+
+/* ===== BUTTON SPACING ===== */
+.actions {
+    margin-top: 2rem;
+}

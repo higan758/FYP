@@ -1,0 +1,28 @@
+﻿@inherits LayoutComponentBase
+
+<div class="layout-root">
+    <header class="top-nav">
+        <span class="brand">CodeQuest</span>
+
+        <nav class="nav-links">
+            <NavLink href="/" Match="NavLinkMatch.All" class="game-btn">
+                Home
+            </NavLink>
+
+            <NavLink href="/lessons">Lessons</NavLink>
+            <NavLink href="/progress">Progress</NavLink>
+
+            <NavLink href="/login" class="game-btn">
+                Login
+            </NavLink>
+
+            <NavLink href="/register" class="game-btn">
+                Register
+            </NavLink>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        @Body
+    </main>
+</div>

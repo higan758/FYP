@@ -1,0 +1,47 @@
+﻿@page "/register"
+@rendermode InteractiveServer
+@using CodeQuestUI.Services
+@inject AuthService Auth
+@inject NavigationManager Nav
+
+<h1>Register</h1>
+
+<input placeholder="Full Name" @bind="fullName" />
+<br />
+<input placeholder="Username" @bind="userName" />
+<br />
+<input placeholder="Email" @bind="email" />
+<br />
+<input placeholder="Password" type="password" @bind="password" />
+<br />
+
+<button @onclick="HandleRegister">Register</button>
+
+@if (!string.IsNullOrWhiteSpace(error))
+{
+    <p style="color:red">@error</p>
+}
+
+@code {
+    string fullName = "";
+    string userName = "";
+    string email = "";
+    string password = "";
+    string? error;
+
+    async Task HandleRegister()
+    {
+        error = null;
+
+        var (ok, err) = await Auth.Register(new()
+        {
+            FullName = fullName,
+            UserName = userName,
+            Email = email,
+            Password = password
+        });
+
+        if (ok) Nav.NavigateTo("/login");
+        else error = err;
+    }
+}

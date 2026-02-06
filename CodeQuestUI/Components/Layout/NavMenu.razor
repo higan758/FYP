@@ -1,0 +1,17 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+
+<nav class="nav">
+    <NavLink href="/" Match="NavLinkMatch.All">Home</NavLink>
+    <NavLink href="/lessons">Lessons</NavLink>
+    <NavLink href="/progress">Progress</NavLink>
+
+    <AuthorizeView>
+        <Authorized>
+            <NavLink href="/logout">Logout</NavLink>
+        </Authorized>
+        <NotAuthorized>
+            <NavLink href="/login">Login</NavLink>
+            <NavLink href="/register">Register</NavLink>
+        </NotAuthorized>
+    </AuthorizeView>
+</nav>
