@@ -1,0 +1,7 @@
+.lessons-wrap { max-width: 980px; margin: 24px auto; padding: 0 16px; }
+.lesson-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+.lesson-card { border: 1px solid #222; border-radius: 12px; padding: 12px; }
+.lesson-card.locked { opacity: 0.55; }
+.lesson-title { font-weight: 700; margin-bottom: 6px; }
+.lesson-meta { font-size: 14px; opacity: 0.9; }
+.badge { display: inline-block; padding: 4px 8px; border-radius: 999px; border: 1px solid #333; font-size: 12px; margin-top: 10px; }

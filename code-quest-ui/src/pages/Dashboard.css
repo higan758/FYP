@@ -1,0 +1,28 @@
+.dashboard {
+  padding: 16px;
+}
+
+.quiz-card {
+  border: 1px solid #222;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+
+.quiz-card:hover {
+  background: #f9f9f9;
+}
+
+.quiz-meta {
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+.muted {
+  opacity: 0.6;
+}
+
+.error {
+  color: red;
+}
