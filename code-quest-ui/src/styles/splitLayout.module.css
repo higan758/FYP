@@ -1,0 +1,30 @@
+/* ===== Split Layout ===== */
+
+.wrap {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-lg);
+  flex: 1;
+}
+
+@media (min-width: 860px) {
+  .wrap {
+    grid-template-columns: 1.1fr 1fr;
+  }
+}
+
+.left, .right {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-base);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.left:hover, .right:hover {
+  box-shadow: var(--shadow-md);
+}

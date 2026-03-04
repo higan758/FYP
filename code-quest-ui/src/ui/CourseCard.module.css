@@ -1,0 +1,14 @@
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: var(--shadow);
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+  cursor: pointer;
+}
+.card:hover { transform: translateY(-4px) scale(1.01); background: var(--panel-2); }
+.titleRow { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.title { margin: 0; font-weight: 700; }
+.desc { margin: 8px 0 0; color: var(--muted); }
+.badge { margin-left: auto; }

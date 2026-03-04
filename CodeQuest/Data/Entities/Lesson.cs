@@ -10,6 +10,8 @@ public class Lesson
 
     public int LevelNumber { get; set; }
 
+    public string? ResourceFilePath { get; set; }
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     // Relationships

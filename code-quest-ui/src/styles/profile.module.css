@@ -1,0 +1,499 @@
+/* ── Profile Page — Instagram-style ───────────────── */
+
+.pageContainer {
+  width: 100%;
+  min-height: 100vh;
+  padding: var(--space-2xl) var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  background-color: var(--color-bg-primary);
+  max-width: 935px;
+  margin: 0 auto;
+}
+
+/* ── Toast notification ──────────────────────────── */
+
+.notification {
+  position: fixed;
+  top: var(--space-lg);
+  right: var(--space-lg);
+  background: linear-gradient(135deg, var(--color-success), var(--color-success-dark));
+  color: white;
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-weight-bold);
+  box-shadow: var(--shadow-lg);
+  animation: slideIn 0.3s ease-out, slideOut 0.3s ease-in 2.7s;
+  z-index: var(--z-tooltip);
+}
+
+@keyframes slideIn {
+  from { transform: translateX(400px); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+@keyframes slideOut {
+  from { transform: translateX(0);     opacity: 1; }
+  to   { transform: translateX(400px); opacity: 0; }
+}
+
+.loading, .error {
+  text-align: center;
+  padding: var(--space-3xl);
+  font-size: var(--font-size-lg);
+  color: var(--color-text-primary);
+}
+.error { color: var(--color-danger); }
+
+/* ── IG-style profile header ─────────────────────── */
+
+.profileHeader {
+  display: flex;
+  gap: var(--space-2xl);
+  align-items: flex-start;
+  padding-bottom: var(--space-xl);
+  border-bottom: 1px solid var(--color-border);
+  animation: fadeIn 0.5s ease-out;
+}
+
+.avatarCol {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.avatarWrap {
+  position: relative;
+  width: 150px;
+  height: 150px;
+}
+
+.avatarImg,
+.avatarInitials {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  background-image: linear-gradient(var(--color-bg-card), var(--color-bg-card)),
+                     linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  font-weight: var(--font-weight-bold);
+  object-fit: cover;
+  color: var(--color-primary);
+}
+
+.avatarInitials {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  color: white;
+}
+
+.avatarUpload {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  border: 3px solid var(--color-bg-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-md);
+}
+.avatarUpload:hover { transform: scale(1.1); }
+.avatarUpload input { display: none; }
+
+.resetAvatarBtn {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 30px;
+  height: 30px;
+  background: var(--color-danger);
+  border: 2px solid var(--color-bg-primary);
+  border-radius: 50%;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-sm);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.resetAvatarBtn:hover { transform: scale(1.1); background: var(--color-danger-dark); }
+
+/* ── Info column (right of avatar) ─────────────── */
+
+.infoCol {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.userName {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-normal);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.editForm {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.editForm input {
+  flex: 1;
+  min-width: 180px;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-base);
+  background-color: var(--color-bg-card);
+  color: var(--color-text-primary);
+  font-family: var(--font-family);
+  transition: all var(--transition-base);
+}
+.editForm input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+.editForm input:disabled {
+  background-color: var(--color-bg-secondary);
+  opacity: 0.6;
+}
+
+.lockMsg {
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* ── IG-style stats row ──────────────────────────── */
+
+.statsRow {
+  display: flex;
+  gap: var(--space-2xl);
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.statNumber {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.statText {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+/* ── Bio line (badges) ───────────────────────────── */
+
+.bioLine {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.emailBadge,
+.roleBadge {
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-full);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  border: 1px solid transparent;
+}
+
+.emailBadge {
+  background-color: var(--color-accent-light);
+  color: var(--color-accent-dark);
+}
+
+.roleBadge {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary-dark);
+}
+.roleBadge.admin {
+  background-color: var(--color-warning-light);
+  color: var(--color-warning-dark);
+}
+.roleBadge.student {
+  background-color: var(--color-success-light);
+  color: var(--color-success-dark);
+}
+
+/* ── Rank Banner ─────────────────────────────────── */
+
+.rankBanner {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.rankBadgeCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-lg) var(--space-xl);
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-base);
+}
+
+.rankBadgeCard:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.rankBadgeCard.rank1 {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.08), rgba(245, 158, 11, 0.04));
+  border-color: #fbbf24;
+}
+.rankBadgeCard.rank2 {
+  background: linear-gradient(135deg, rgba(156, 163, 175, 0.08), rgba(209, 213, 219, 0.04));
+  border-color: #9ca3af;
+}
+.rankBadgeCard.rank3 {
+  background: linear-gradient(135deg, rgba(234, 140, 85, 0.08), rgba(217, 119, 6, 0.04));
+  border-color: #ea8c55;
+}
+
+.rankIcon {
+  font-size: 2.5rem;
+  flex-shrink: 0;
+}
+
+.rankInfo {
+  flex: 1;
+}
+
+.rankValue {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.rankDesc {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.rankScore {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  white-space: nowrap;
+}
+
+/* ── Detail Cards Grid ───────────────────────────── */
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+  animation: fadeIn 0.7s ease-out;
+}
+
+.detailCard {
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-xl);
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-base);
+}
+
+.detailCard:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.detailCard h3 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-lg);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* ── Progress bars in detail cards ───────────────── */
+
+.progressItem {
+  margin-bottom: var(--space-lg);
+}
+.progressItem:last-child {
+  margin-bottom: 0;
+}
+
+.progressLabel {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--space-sm);
+  font-size: var(--font-size-sm);
+}
+
+.progressBarWrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.progressBarTrack {
+  flex: 1;
+  height: 10px;
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progressBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  border-radius: var(--radius-full);
+  transition: width 0.5s ease;
+}
+
+.progressCount {
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  min-width: 60px;
+  text-align: right;
+}
+
+/* ── Mini Stat grid in detail card ───────────────── */
+
+.miniStats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+.miniStat {
+  text-align: center;
+  padding: var(--space-md);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-xl);
+  transition: all var(--transition-base);
+}
+
+.miniStat:hover {
+  background: var(--color-primary-light);
+}
+
+.miniStatVal {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+}
+
+.miniStatLbl {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+/* ── Animations ──────────────────────────────────── */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Responsive ──────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .pageContainer {
+    padding: var(--space-lg) var(--space-md);
+    gap: var(--space-lg);
+  }
+
+  .profileHeader {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--space-lg);
+  }
+
+  .avatarWrap {
+    width: 120px;
+    height: 120px;
+  }
+  .avatarImg, .avatarInitials {
+    width: 120px;
+    height: 120px;
+    font-size: 2.2rem;
+  }
+
+  .nameRow {
+    justify-content: center;
+  }
+
+  .userName {
+    font-size: var(--font-size-xl);
+  }
+
+  .statsRow {
+    justify-content: center;
+    gap: var(--space-xl);
+  }
+
+  .bioLine {
+    justify-content: center;
+  }
+
+  .detailGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .editForm {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .editForm input {
+    min-width: unset;
+  }
+
+  .rankBadgeCard {
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .notification {
+    left: var(--space-md);
+    right: var(--space-md);
+    top: var(--space-md);
+  }
+}

@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace CodeQuest.Migrations
 {
-    /// <inheritdoc />
+   
     public partial class AddUserQuizProgress : Migration
     {
-        /// <inheritdoc />
+   
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -50,7 +50,6 @@ namespace CodeQuest.Migrations
                 column: "UserId");
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

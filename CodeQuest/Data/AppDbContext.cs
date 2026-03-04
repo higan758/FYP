@@ -10,14 +10,13 @@ public class AppDbContext : DbContext
     {
     }
 
-    public DbSet<User> Users => Set<User>();
-    public DbSet<Attempt> Attempts => Set<Attempt>();
-    public DbSet<CodeSubmission> CodeSubmissions => Set<CodeSubmission>();
-    public DbSet<Lesson> Lessons => Set<Lesson>();
-    public DbSet<Quiz> Quizzes => Set<Quiz>();
-    public DbSet<Question> Questions => Set<Question>();
-    public DbSet<UserQuizProgress> UserQuizProgresses => Set<UserQuizProgress>();
-
+    public DbSet<User> Users { get; set; }
+    public DbSet<Attempt> Attempts { get; set; }
+    public DbSet<CodeSubmission> CodeSubmissions { get; set; }
+    public DbSet<Lesson> Lessons { get; set; }
+    public DbSet<Quiz> Quizzes { get; set; }
+    public DbSet<Question> Questions { get; set; }
+    public DbSet<UserQuizProgress> UserQuizProgresses { get; set; }
 
 
 

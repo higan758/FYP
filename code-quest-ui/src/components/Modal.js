@@ -1,22 +1,16 @@
 import React from "react";
-import "./Modal.css";
+import styles from "../styles/quizBattle.module.css";
 
-export default function Modal({ open, onClose, title, children }) {
+export default function Modal({ open, title, children, actions, onClose }) {
   if (!open) return null;
-
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div
-        className="modal"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h2 className="modal-title">{title}</h2>
-
-        <div className="modal-content">{children}</div>
-
-        <button className="modal-close" onClick={onClose}>
-          Close
-        </button>
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
+        {title ? <h3 style={{ marginTop: 0 }}>{title}</h3> : null}
+        <div>{children}</div>
+        <div className={styles.modalActions}>
+          {actions}
+        </div>
       </div>
     </div>
   );

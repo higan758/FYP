@@ -1,0 +1,37 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": ".NET Launch API",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/CodeQuest/bin/Debug/net9.0/CodeQuest.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/CodeQuest",
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+      }
+    },
+    {
+      "name": "Launch Browser (CRA)",
+      "type": "pwa-chrome",
+      "request": "launch",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}/code-quest-ui/src"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Full Stack (API + CRA)",
+      "configurations": [
+        ".NET Launch API",
+        "Launch Browser (CRA)"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+.section {
+  position: relative;
+  padding: 48px 0;
+}
+.dark {
+  background: linear-gradient(180deg, #0f172a, #111827);
+  color: #e5e7eb;
+}
+.gradient {
+  background:
+    radial-gradient(1000px 500px at 0% -20%, rgba(37,99,235,.12), transparent),
+    radial-gradient(1000px 500px at 100% -20%, rgba(99,102,241,.12), transparent);
+}
+.wrap {
+  width: min(1100px, 100% - 32px);
+  margin-inline: auto;
+}
+.title {
+  font-weight: 800;
+  font-size: clamp(24px, 4.6vw, 36px);
+  margin: 0 0 8px;
+}
+.subtitle {
+  margin: 0 0 16px;
+  color: #cbd5e1;
+}

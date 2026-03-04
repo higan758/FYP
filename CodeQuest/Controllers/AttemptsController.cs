@@ -148,7 +148,12 @@ public class AttemptsController : ControllerBase
                 : attempt.PlayerHp <= 0
                     ? "Defeat"
                     : "In Progress",
-            attempt.AttemptedAt
+            attempt.AttemptedAt,
+            Answers = quiz.Questions.Select(q => new
+            {
+                QuestionId = q.Id,
+                CorrectAnswer = q.CorrectAnswer
+            })
         });
     }
 

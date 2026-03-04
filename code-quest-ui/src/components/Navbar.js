@@ -1,28 +1,78 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
+import styles from "../styles/navbar.module.css";
 
 export default function Navbar() {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, isAdmin, logout } = useAuth();
+  const location = useLocation();
 
   return (
-    <div style={{ display: "flex", gap: 12, padding: 12, borderBottom: "1px solid #222" }}>
-      <Link to="/">CodeQuest</Link>
+    <nav className={styles.navbar}>
+      <div className={styles.container}>
+        <Link to="/" className={styles.logo}>
+          <span className={styles.logoIcon}>⚔️</span>
+          <span className={styles.logoText}>CodeQuest</span>
+        </Link>
 
-      <div style={{ marginLeft: "auto", display: "flex", gap: 12 }}>
-        {isAuthenticated ? (
-          <>
-            <Link to="/lessons">Lessons</Link>
-            <Link to="/dashboard">Dashboard</Link>
-            <button onClick={logout}>Logout</button>
-          </>
-        ) : (
-          <>
-            <Link to="/login">Login</Link>
-            <Link to="/register">Register</Link>
-          </>
+        <div className={styles.spacer} />
+
+        <div className={styles.links}>
+          {isAuthenticated ? (
+            isAdmin ? (
+              <>
+                <Link 
+                  to="/admin" 
+                  className={`${styles.link} ${location.pathname === "/admin" ? styles.active : ""}`}
+                >
+                  📊 Dashboard
+                </Link>
+                <Link 
+                  to="/admin/users" 
+                  className={`${styles.link} ${location.pathname === "/admin/users" ? styles.active : ""}`}
+                >
+                  👥 Users
+                </Link>
+                <Link 
+                  to="/admin/lessons" 
+                  className={`${styles.link} ${location.pathname === "/admin/lessons" ? styles.active : ""}`}
+                >
+                  📚 Lessons
+                </Link>
+                <Link 
+                  to="/admin/quizzes" 
+                  className={`${styles.link} ${location.pathname === "/admin/quizzes" ? styles.active : ""}`}
+                >
+                  ✅ Quizzes
+                </Link>
+                <Link 
+                  to="/admin/questions" 
+                  className={`${styles.link} ${location.pathname === "/admin/questions" ? styles.active : ""}`}
+                >
+                  ❓ Questions
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link to="/lessons" className={styles.link}>📚 Lessons</Link>
+                <Link to="/leaderboard" className={styles.link}>🏆 Leaderboard</Link>
+                <Link to="/profile" className={styles.link}>👤 Profile</Link>
+              </>
+            )
+          ) : (
+            <>
+              <Link to="/login" className={styles.link}>Login</Link>
+              <Link to="/register" className={styles.link}>Register</Link>
+            </>
+          )}
+        </div>
+
+        {isAuthenticated && (
+          <button className={styles.logoutBtn} onClick={logout}>
+            🚪 Logout
+          </button>
         )}
       </div>
-    </div>
+    </nav>
   );
 }

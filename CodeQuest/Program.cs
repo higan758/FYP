@@ -1,6 +1,7 @@
-﻿using CodeQuest.Data;
+using CodeQuest.Data;
 using CodeQuest.Data.Interfaces;
 using CodeQuest.Data.Repositories;
+using CodeQuest.Services;
 using CodeQuest.Services.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +10,6 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//cors
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -24,21 +24,21 @@ builder.Services.AddCors(options =>
     });
 });
 
-// controllers
 builder.Services.AddControllers();
 
-// satabase
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// repos
+builder.Services.AddScoped<RoslynCodeExecutionService>();
+
 builder.Services.AddScoped<ILessonRepository, LessonRepository>();
 builder.Services.AddScoped<IQuizRepository, QuizRepository>();
+builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 
-// auth services
+builder.Services.AddHttpClient();
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 
-// JWT auth
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -59,7 +59,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-// swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -99,8 +98,63 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("AllowFrontend");
 
+app.UseStaticFiles();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+    var hasher = new Microsoft.AspNetCore.Identity.PasswordHasher<CodeQuest.Data.Entities.User>();
+    var adminEmails = config.GetSection("Admin:Emails").Get<string[]>() ?? Array.Empty<string>();
+    var adminPassword = config["Admin:Password"];
+    foreach (var e in adminEmails)
+    {
+        var email = (e ?? string.Empty).Trim().ToLowerInvariant();
+        if (string.IsNullOrWhiteSpace(email)) continue;
+        var user = await db.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email);
+        if (user == null)
+        {
+            user = new CodeQuest.Data.Entities.User
+            {
+                Id = Guid.NewGuid(),
+                FullName = email,
+                UserName = email,
+                Email = email,
+                Role = "Admin",
+                IsActive = true,
+                EmailConfirmed = true,
+            };
+            if (!string.IsNullOrWhiteSpace(adminPassword))
+            {
+                user.PasswordHash = hasher.HashPassword(user, adminPassword!);
+            }
+            else
+            {
+                user.PasswordHash = hasher.HashPassword(user, Guid.NewGuid().ToString("n"));
+            }
+            db.Users.Add(user);
+            await db.SaveChangesAsync();
+        }
+        else
+        {
+            if (user.Role != "Admin")
+            {
+                user.Role = "Admin";
+                await db.SaveChangesAsync();
+            }
+            if (!string.IsNullOrWhiteSpace(adminPassword))
+            {
+              
+                user.PasswordHash = hasher.HashPassword(user, adminPassword!);
+                await db.SaveChangesAsync();
+            }
+        }
+    }
+}
 app.Run();

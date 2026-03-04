@@ -1,0 +1,80 @@
+/* ===== Code Panel ===== */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  flex: 1;
+}
+
+.editorWrap {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: #1e1e2e;
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+}
+
+.editorWrap:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.textarea {
+  width: 100%;
+  min-height: 280px;
+  font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', Consolas, Monaco, monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  padding: var(--space-md);
+  outline: none;
+  border: none;
+  background: #1e1e2e;
+  color: #cdd6f4;
+  resize: vertical;
+  tab-size: 4;
+}
+
+.textarea::placeholder {
+  color: #585b70;
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+}
+
+.terminal {
+  background: #0f111a;
+  border: 1px solid #1e2030;
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  min-height: 130px;
+  position: relative;
+}
+
+.terminal::before {
+  content: 'Output';
+  display: block;
+  font-size: var(--font-size-xs);
+  color: #585b70;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.terminal pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #a6e3a1;
+}
+
+.error {
+  color: #f38ba8 !important;
+}

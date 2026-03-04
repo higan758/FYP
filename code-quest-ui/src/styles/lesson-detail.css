@@ -1,0 +1,14 @@
+.lesson-detail {
+  padding: 24px;
+}
+
+.lesson-desc {
+  color: #555;
+}
+
+.lesson-content {
+  margin: 20px 0;
+  padding: 16px;
+  background: #f2f2f2;
+  border-radius: 8px;
+}

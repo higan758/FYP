@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
+import PasswordInput from "../components/PasswordInput";
+import GoogleLoginButton from "../components/GoogleLoginButton";
 import "../styles/auth.css";
 
 export default function Register() {
@@ -25,12 +27,18 @@ export default function Register() {
         password,
       });
 
-      // If register returned a token, you’ll already be logged in.
-      // If not, go to login.
       nav("/login");
     } catch (ex) {
       setErr(ex.message);
     }
+  }
+
+  function handleGoogleSuccess() {
+    nav("/lessons");
+  }
+
+  function handleGoogleError(msg) {
+    setErr(msg);
   }
 
   return (
@@ -50,21 +58,22 @@ export default function Register() {
 
         <div className="auth-field">
           <label>Email</label>
-          <input value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
-        </div>
-
-        <div className="auth-field">
-          <label>Password</label>
           <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete="new-password"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
           />
         </div>
 
+        <PasswordInput
+          label="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          autoComplete="new-password"
+        />
+
         <div className="auth-actions">
-          <button type="submit">Create Account</button>
+          <button type="submit" className="btn btn-primary">Create Account</button>
           <span>
             Have an account? <Link to="/login">Login</Link>
           </span>
@@ -72,6 +81,10 @@ export default function Register() {
 
         {err ? <div className="auth-error">{err}</div> : null}
       </form>
+
+      <div className="auth-divider"><span>or</span></div>
+
+      <GoogleLoginButton onSuccess={handleGoogleSuccess} onError={handleGoogleError} />
     </div>
   );
 }

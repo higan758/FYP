@@ -1,4 +1,4 @@
-﻿using CodeQuest.Data.DTOs;
+using CodeQuest.Data.DTOs;
 using CodeQuest.Services.Auth;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,14 +18,42 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterUserDto dto)
     {
-        var result = await _authService.RegisterAsync(dto);
-        return Ok(result);
+        try
+        {
+            var result = await _authService.RegisterAsync(dto);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginUserDto dto)
     {
-        var result = await _authService.LoginAsync(dto);
-        return Ok(result);
+        try
+        {
+            var result = await _authService.LoginAsync(dto);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpPost("google")]
+    public async Task<IActionResult> GoogleLogin(GoogleLoginDto dto)
+    {
+        try
+        {
+            var result = await _authService.GoogleLoginAsync(dto);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿using CodeQuest.Data.Entities;
+using CodeQuest.Data.Entities;
 using CodeQuest.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,5 +34,21 @@ public class LessonRepository : ILessonRepository
     {
         _context.Lessons.Add(lesson);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateAsync(Lesson lesson)
+    {
+        _context.Lessons.Update(lesson);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(Guid id)
+    {
+        var lesson = await _context.Lessons.FirstOrDefaultAsync(l => l.Id == id);
+        if (lesson != null)
+        {
+            _context.Lessons.Remove(lesson);
+            await _context.SaveChangesAsync();
+        }
     }
 }

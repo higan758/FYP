@@ -1,33 +1,51 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
+import PasswordInput from "../components/PasswordInput";
+import GoogleLoginButton from "../components/GoogleLoginButton";
 import "../styles/auth.css";
+import Toast from "../components/Toast";
 
 export default function Login() {
-  const { login } = useAuth();
+  const { login, isAdmin } = useAuth();
   const nav = useNavigate();
 
   const [emailOrUsername, setEmailOrUsername] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState("");
+  const [toastMsg, setToastMsg] = useState("");
 
   async function onSubmit(e) {
     e.preventDefault();
     setErr("");
 
     try {
-      // If your backend expects { email, password } OR { userName, password },
-      // send both safely (backend will ignore unknown field).
       await login({
         email: emailOrUsername,
         userName: emailOrUsername,
         password,
       });
 
-      nav("/lessons");
+      setToastMsg(isAdmin ? "You have logged in as Admin" : "You have logged in");
+      setTimeout(() => {
+        setToastMsg("");
+        nav(isAdmin ? "/admin" : "/lessons");
+      }, 1200);
     } catch (ex) {
       setErr(ex.message);
     }
+  }
+
+  function handleGoogleSuccess() {
+    setToastMsg("Logged in with Google");
+    setTimeout(() => {
+      setToastMsg("");
+      nav("/lessons");
+    }, 1200);
+  }
+
+  function handleGoogleError(msg) {
+    setErr(msg);
   }
 
   return (
@@ -44,18 +62,15 @@ export default function Login() {
           />
         </div>
 
-        <div className="auth-field">
-          <label>Password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete="current-password"
-          />
-        </div>
+        <PasswordInput
+          label="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          autoComplete="current-password"
+        />
 
         <div className="auth-actions">
-          <button type="submit">Login</button>
+          <button type="submit" className="btn btn-primary">Login</button>
           <span>
             No account? <Link to="/register">Register</Link>
           </span>
@@ -63,6 +78,12 @@ export default function Login() {
 
         {err ? <div className="auth-error">{err}</div> : null}
       </form>
+
+      <div className="auth-divider"><span>or</span></div>
+
+      <GoogleLoginButton onSuccess={handleGoogleSuccess} onError={handleGoogleError} />
+
+      {toastMsg ? <Toast message={toastMsg} onClose={() => setToastMsg("")} /> : null}
     </div>
   );
 }

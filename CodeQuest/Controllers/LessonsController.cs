@@ -1,6 +1,7 @@
-﻿using CodeQuest.Data.Entities;
+using CodeQuest.Data.Entities;
 using CodeQuest.Data.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CodeQuest.Controllers;
 
@@ -31,7 +32,21 @@ public class LessonsController : ControllerBase
         return Ok(lesson);
     }
 
+    [HttpGet("{id}/ppt")]
+    [Authorize]
+    public async Task<IActionResult> GetResource(Guid id)
+    {
+        var lesson = await _lessonRepository.GetByIdAsync(id);
+        if (lesson == null) return NotFound();
+
+        if (string.IsNullOrWhiteSpace(lesson.ResourceFilePath))
+            return Ok(new { url = (string?)null });
+
+        return Ok(new { url = lesson.ResourceFilePath });
+    }
+
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create(Lesson lesson)
     {
         await _lessonRepository.AddAsync(lesson);
