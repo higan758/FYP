@@ -3,6 +3,37 @@ import { http } from "../api/http";
 import { endpoints } from "../api/endpoints";
 import styles from "./aiChatWidget.module.css";
 
+// Helper to format message content with code blocks
+function formatMessage(content) {
+  const parts = [];
+  const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```|`([^`]+)`/g;
+  let lastIndex = 0;
+  let match;
+
+  while ((match = codeBlockRegex.exec(content)) !== null) {
+    // Add text before code block
+    if (match.index > lastIndex) {
+      parts.push({ type: "text", content: content.slice(lastIndex, match.index) });
+    }
+
+    // Add code block (multiline or inline)
+    if (match[2]) {
+      parts.push({ type: "code", language: match[1] || "text", content: match[2].trim() });
+    } else if (match[3]) {
+      parts.push({ type: "inline-code", content: match[3] });
+    }
+
+    lastIndex = match.index + match[0].length;
+  }
+
+  // Add remaining text
+  if (lastIndex < content.length) {
+    parts.push({ type: "text", content: content.slice(lastIndex) });
+  }
+
+  return parts.length > 0 ? parts : [{ type: "text", content }];
+}
+
 export default function AiChatWidget({ lessonTitle }) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState(() => {
@@ -77,33 +108,55 @@ export default function AiChatWidget({ lessonTitle }) {
   return (
     <>
       {open && (
-        <div className={styles.panel}>
-          <div className={styles.header}>
+        <div className={styles.chatContainer}>
+          <div className={styles.chatHeader}>
             <span>CodeQuest AI Tutor</span>
             <button className={styles.closeBtn} onClick={() => setOpen(false)}>
               ×
             </button>
           </div>
-          <div className={styles.messages}>
+
+          <div className={styles.chatMessages}>
             {messages.length === 0 && (
-              <div style={{ textAlign: "center", color: "#9ca3af", fontSize: 12 }}>
+              <div className={styles.emptyState}>
                 👋 Hi! I'm your CodeQuest AI Tutor. Ask me anything about C# or programming!
               </div>
             )}
             {messages.map((m, idx) => (
-              <div key={idx} className={m.role === "user" ? styles.userMsg : styles.aiMsg}>
-                {m.content}
+              <div key={idx} className={m.role === "user" ? styles.userBubble : styles.aiBubble}>
+                {formatMessage(m.content).map((part, i) => {
+                  if (part.type === "code") {
+                    return (
+                      <pre key={i} className={styles.codeBlock}>
+                        <code>{part.content}</code>
+                      </pre>
+                    );
+                  } else if (part.type === "inline-code") {
+                    return (
+                      <code key={i} className={styles.inlineCode}>
+                        {part.content}
+                      </code>
+                    );
+                  } else {
+                    return (
+                      <span key={i} style={{ whiteSpace: "pre-wrap" }}>
+                        {part.content}
+                      </span>
+                    );
+                  }
+                })}
               </div>
             ))}
             <div ref={scrollRef}></div>
           </div>
-          <div className={styles.inputArea}>
+
+          <div className={styles.chatInputArea}>
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKey}
               disabled={loading}
-              className={styles.textarea}
+              className={styles.inputField}
               rows={1}
               placeholder="Type a message..."
             />

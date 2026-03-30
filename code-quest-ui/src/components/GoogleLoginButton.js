@@ -2,14 +2,6 @@ import React, { useState } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../auth/AuthContext";
 
-/**
- * "Continue with Google" button using Google One Tap / popup credential flow.
- * Returns an id_token directly which is verified server-side.
- *
- * Props:
- *  - onSuccess(authResponse)  — called after successful backend auth
- *  - onError(errorMessage)    — called on failure
- */
 export default function GoogleLoginButton({ onSuccess, onError }) {
   const { googleLogin } = useAuth();
   const [loading, setLoading] = useState(false);

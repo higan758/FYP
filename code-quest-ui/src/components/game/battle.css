@@ -1,0 +1,485 @@
+.battle-scene {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  height: 400px;
+  margin: 0 auto;
+  background: linear-gradient(to bottom, #87ceeb 0%, #98d8c8 50%, #6db88a 100%);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.battle-clouds {
+  position: absolute;
+  top: 0;
+  left: -35%;
+  width: 170%;
+  height: 52%;
+  z-index: 0;
+  pointer-events: none;
+  animation: cloud-drift 90s linear infinite;
+}
+
+.cloud {
+  position: absolute;
+  border-radius: 999px;
+  background: rgba(248, 252, 255, 0.75);
+  filter: blur(0.3px);
+}
+
+.cloud::before,
+.cloud::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  background: inherit;
+}
+
+.cloud-1 {
+  width: 130px;
+  height: 34px;
+  top: 16%;
+  left: 8%;
+}
+
+.cloud-1::before {
+  width: 58px;
+  height: 46px;
+  top: -20px;
+  left: 22px;
+}
+
+.cloud-1::after {
+  width: 66px;
+  height: 38px;
+  top: -14px;
+  right: 14px;
+}
+
+.cloud-2 {
+  width: 165px;
+  height: 42px;
+  top: 30%;
+  left: 42%;
+  opacity: 0.86;
+}
+
+.cloud-2::before {
+  width: 74px;
+  height: 52px;
+  top: -22px;
+  left: 32px;
+}
+
+.cloud-2::after {
+  width: 86px;
+  height: 46px;
+  top: -18px;
+  right: 18px;
+}
+
+.cloud-3 {
+  width: 118px;
+  height: 30px;
+  top: 20%;
+  left: 78%;
+  opacity: 0.7;
+}
+
+.cloud-3::before {
+  width: 52px;
+  height: 40px;
+  top: -18px;
+  left: 18px;
+}
+
+.cloud-3::after {
+  width: 60px;
+  height: 34px;
+  top: -12px;
+  right: 10px;
+}
+
+.battle-mountains {
+  position: absolute;
+  left: -5%;
+  right: -5%;
+  bottom: 74px;
+  height: 45%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(155deg, transparent 45%, rgba(90, 112, 120, 0.9) 46%) 0 100% / 36% 100% no-repeat,
+    linear-gradient(205deg, transparent 44%, rgba(90, 112, 120, 0.9) 45%) 26% 100% / 34% 100% no-repeat,
+    linear-gradient(155deg, transparent 45%, rgba(71, 93, 102, 0.95) 46%) 45% 100% / 42% 100% no-repeat,
+    linear-gradient(205deg, transparent 44%, rgba(71, 93, 102, 0.95) 45%) 66% 100% / 34% 100% no-repeat,
+    linear-gradient(155deg, transparent 45%, rgba(58, 79, 89, 0.95) 46%) 84% 100% / 30% 100% no-repeat;
+}
+
+.battle-ground {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: linear-gradient(to bottom, #8b7355 0%, #6b5644 100%);
+  border-top: 4px solid #5a4633;
+  z-index: 1;
+}
+
+.battle-foreground-grass {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 50px;
+  height: 22px;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 8px 20px, #2c8a4f 0 7px, transparent 8px) 0 0 / 24px 22px repeat-x,
+    radial-gradient(circle at 14px 21px, #38a35d 0 7px, transparent 8px) 0 0 / 30px 22px repeat-x;
+}
+
+.battle-characters {
+  position: absolute;
+  bottom: 60px;
+  left: 0;
+  right: 0;
+  height: calc(100% - 120px);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 0 80px;
+  z-index: 3;
+}
+
+.character-player {
+  position: relative;
+  z-index: 2;
+}
+
+.character-enemy {
+  position: relative;
+  z-index: 2;
+  /* Lift slime so both characters share the same visual ground line. */
+  margin-bottom: 10px;
+}
+
+.hp-bars-container {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+  z-index: 10;
+}
+
+@keyframes cloud-drift {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-18%);
+  }
+}
+
+.hp-bar-wrapper {
+  flex: 1;
+  max-width: 300px;
+}
+
+.hp-bar-wrapper.left {
+  align-self: flex-start;
+}
+
+.hp-bar-wrapper.right {
+  align-self: flex-end;
+}
+
+.hp-bar-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  font-family: 'PixelOperator8', monospace;
+  font-size: 14px;
+  color: #fff;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+.hp-label-text {
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.hp-label-value {
+  font-size: 12px;
+}
+
+.hp-bar-container {
+  width: 100%;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.hp-bar-fill {
+  height: 100%;
+  background: #10b981;
+  border-radius: 8px;
+  transition: width 0.5s ease-out;
+  position: relative;
+  box-shadow: inset 0 2px 8px rgba(255, 255, 255, 0.4);
+}
+
+.sprite-container {
+  position: relative;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+.sprite {
+  position: absolute;
+  top: 0;
+  left: 0;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+.damage-text {
+  position: absolute;
+  font-family: 'PixelOperator8', monospace;
+  font-size: 32px;
+  font-weight: bold;
+  pointer-events: none;
+  z-index: 100;
+  animation: float-up 1.5s ease-out forwards;
+  text-shadow: 
+    2px 2px 0 rgba(0, 0, 0, 0.8),
+    -2px -2px 0 rgba(0, 0, 0, 0.8),
+    2px -2px 0 rgba(0, 0, 0, 0.8),
+    -2px 2px 0 rgba(0, 0, 0, 0.8);
+}
+
+.damage-text.player {
+  color: #ef4444;
+  filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.8));
+}
+
+.damage-text.enemy {
+  color: #fbbf24;
+  filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.8));
+}
+
+@keyframes float-up {
+  0% {
+    transform: translateY(0) scale(0.5);
+    opacity: 0;
+  }
+  20% {
+    transform: translateY(-20px) scale(1.2);
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-80px) scale(1);
+    opacity: 0;
+  }
+}
+
+.battle-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 200;
+  animation: fade-in 0.5s ease-out;
+}
+
+.battle-result {
+  font-family: 'PixelOperator8', monospace;
+  font-size: 64px;
+  font-weight: bold;
+  text-align: center;
+  animation: bounce-in 0.6s ease-out;
+}
+
+.battle-result.victory {
+  color: #10b981;
+  text-shadow: 
+    4px 4px 0 rgba(0, 0, 0, 0.8),
+    0 0 20px rgba(16, 185, 129, 0.8);
+}
+
+.battle-result.defeat {
+  color: #ef4444;
+  text-shadow: 
+    4px 4px 0 rgba(0, 0, 0, 0.8),
+    0 0 20px rgba(239, 68, 68, 0.8);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .battle-scene {
+    height: 300px;
+    max-width: 100%;
+    border-radius: 8px;
+  }
+
+  .battle-mountains {
+    bottom: 66px;
+    height: 42%;
+  }
+
+  .battle-ground {
+    height: 54px;
+  }
+
+  .battle-foreground-grass {
+    bottom: 45px;
+    height: 18px;
+    background-size: 20px 18px, 24px 18px;
+  }
+
+  .battle-characters {
+    bottom: 54px;
+    padding: 0 40px;
+  }
+
+  .character-enemy {
+    margin-bottom: 8px;
+  }
+
+  .hp-bars-container {
+    flex-direction: column;
+    gap: 12px;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+  }
+
+  .hp-bar-wrapper {
+    max-width: 100%;
+  }
+
+  .damage-text {
+    font-size: 24px;
+  }
+
+  .battle-result {
+    font-size: 48px;
+  }
+}
+
+@media (max-width: 480px) {
+  .battle-scene {
+    height: 250px;
+  }
+
+  .battle-mountains {
+    bottom: 60px;
+    height: 38%;
+  }
+
+  .battle-ground {
+    height: 48px;
+  }
+
+  .battle-foreground-grass {
+    bottom: 40px;
+    height: 16px;
+    background-size: 16px 16px, 20px 16px;
+  }
+
+  .battle-characters {
+    bottom: 48px;
+    padding: 0 20px;
+  }
+
+  .character-enemy {
+    margin-bottom: 6px;
+  }
+
+  .hp-bar-label {
+    font-size: 12px;
+  }
+
+  .hp-label-value {
+    font-size: 10px;
+  }
+
+  .damage-text {
+    font-size: 20px;
+  }
+
+  .battle-result {
+    font-size: 36px;
+  }
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-4px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(4px);
+  }
+}
+
+.shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes flash {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.flash {
+  animation: flash 0.3s ease-in-out;
+}

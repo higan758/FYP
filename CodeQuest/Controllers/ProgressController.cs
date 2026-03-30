@@ -31,6 +31,15 @@ public class ProgressController : ControllerBase
                 q.Id,
                 q.Title,
                 q.LessonId,
+                Progress = _context.UserQuizProgresses
+                    .Where(p => p.UserId == userId && p.QuizId == q.Id)
+                    .Select(p => new
+                    {
+                        p.Completed,
+                        p.BestScore,
+                        p.LastAttemptAt
+                    })
+                    .FirstOrDefault(),
                 LatestAttempt = _context.Attempts
                     .Where(a => a.UserId == userId && a.QuizId == q.Id)
                     .OrderByDescending(a => a.AttemptedAt)
@@ -47,6 +56,16 @@ public class ProgressController : ControllerBase
                             "In Progress"
                     })
                     .FirstOrDefault()
+            })
+            .Select(x => new
+            {
+                x.Id,
+                x.Title,
+                x.LessonId,
+                Completed = x.Progress != null && x.Progress.Completed,
+                BestScore = x.Progress != null ? x.Progress.BestScore : 0,
+                LastAttemptAt = x.Progress != null ? x.Progress.LastAttemptAt : (DateTime?)null,
+                x.LatestAttempt
             })
             .ToListAsync();
 
@@ -70,6 +89,15 @@ public class ProgressController : ControllerBase
         foreach (var lesson in lessons)
         {
             bool unlocked;
+            bool completed;
+
+            var lessonQuizIds = await _context.Quizzes
+                .Where(q => q.LessonId == lesson.Id)
+                .Select(q => q.Id)
+                .ToListAsync();
+
+            completed = lessonQuizIds.Any() && await _context.UserQuizProgresses
+                .AnyAsync(p => p.UserId == userId && p.Completed && lessonQuizIds.Contains(p.QuizId));
 
             if (lesson.LevelNumber == 1)
             {
@@ -78,24 +106,13 @@ public class ProgressController : ControllerBase
             else
             {
                 var prevLesson = lessons.First(l => l.LevelNumber == lesson.LevelNumber - 1);
-
-                var prevQuiz = await _context.Quizzes
+                var prevLessonQuizIds = await _context.Quizzes
                     .Where(q => q.LessonId == prevLesson.Id)
-                    .FirstOrDefaultAsync();
+                    .Select(q => q.Id)
+                    .ToListAsync();
 
-                if (prevQuiz == null)
-                {
-                    unlocked = false;
-                }
-                else
-                {
-                    var latestAttempt = await _context.Attempts
-                        .Where(a => a.UserId == userId && a.QuizId == prevQuiz.Id)
-                        .OrderByDescending(a => a.AttemptedAt)
-                        .FirstOrDefaultAsync();
-
-                    unlocked = latestAttempt != null && latestAttempt.EnemyHp <= 0;
-                }
+                unlocked = prevLessonQuizIds.Any() && await _context.UserQuizProgresses
+                    .AnyAsync(p => p.UserId == userId && p.Completed && prevLessonQuizIds.Contains(p.QuizId));
             }
 
             result.Add(new
@@ -103,7 +120,8 @@ public class ProgressController : ControllerBase
                 lessonId = lesson.Id,
                 lesson.Title,
                 lesson.LevelNumber,
-                Unlocked = unlocked
+                Unlocked = unlocked,
+                Completed = completed
             });
         }
 

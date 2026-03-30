@@ -13,6 +13,7 @@ public class AiController : ControllerBase
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly string _huggingFaceKey;
+    private const string TutorSystemPrompt = "You are CodeQuest AI Tutor, a friendly and natural AI assistant inside a C# learning platform.\nYou can answer both general questions and programming questions.\nIf the user asks a programming or C# question, explain clearly and give examples when useful.\nIf the user asks a general question, respond naturally like a normal assistant.\nNever reveal internal reasoning, hidden thoughts, planning, or tags like <think>.\nOnly return the final answer.\nKeep responses short, clear, and conversational.";
 
     public AiController(IHttpClientFactory httpClientFactory, IConfiguration config)
     {
@@ -32,16 +33,15 @@ public class AiController : ControllerBase
         var client = _httpClientFactory.CreateClient();
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _huggingFaceKey);
 
-        // HuggingFace now uses OpenAI-compatible chat completions endpoint
         var payload = new
         {
-            model = "deepseek-ai/DeepSeek-R1:fastest",
+            model = "meta-llama/Meta-Llama-3-8B-Instruct",
             messages = new object[]
             {
                 new
                 {
                     role = "system",
-                    content = "You are a helpful C# tutor. Answer clearly and concisely. Limit responses to 2-3 sentences."
+                    content = TutorSystemPrompt
                 },
                 new
                 {
@@ -49,8 +49,8 @@ public class AiController : ControllerBase
                     content = dto.Message
                 }
             },
-            max_tokens = 200,
-            temperature = 0.7
+            max_tokens = 300,
+            temperature = 0.6
         };
 
         var requestUrl = "https://router.huggingface.co/v1/chat/completions";
@@ -59,34 +59,81 @@ public class AiController : ControllerBase
         {
             Console.WriteLine($"[HuggingFace] Request URL: {requestUrl}");
 
-            using var request = new HttpRequestMessage(HttpMethod.Post, requestUrl);
-            request.Content = new StringContent(
-                System.Text.Json.JsonSerializer.Serialize(payload),
-                System.Text.Encoding.UTF8,
-                "application/json"
-            );
+            const int maxRetries = 3;
+            string? lastErrorContent = null;
+            int? lastStatusCode = null;
 
-            var response = await client.SendAsync(request);
-            var content = await response.Content.ReadAsStringAsync();
-
-            Console.WriteLine($"[HuggingFace] HTTP Status: {(int)response.StatusCode} {response.StatusCode}");
-            Console.WriteLine($"[HuggingFace] Raw Response: {content}");
-
-            // Handle 403 Forbidden
-            if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
-                return StatusCode(403, new { error = "HuggingFace permission denied (403)", detail = content });
-
-            // Handle 429 Rate Limit
-            if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
-                return StatusCode(429, new { error = "HuggingFace rate limit exceeded", detail = content });
-
-            // Handle 400 Bad Request
-            if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
-                return StatusCode(400, new { error = "Bad request to HuggingFace", detail = content });
-
-            // Handle other non-success responses
-            if (!response.IsSuccessStatusCode)
+            for (var attempt = 1; attempt <= maxRetries; attempt++)
             {
+                using var request = new HttpRequestMessage(HttpMethod.Post, requestUrl);
+                request.Content = new StringContent(
+                    System.Text.Json.JsonSerializer.Serialize(payload),
+                    System.Text.Encoding.UTF8,
+                    "application/json"
+                );
+
+                var response = await client.SendAsync(request);
+                var content = await response.Content.ReadAsStringAsync();
+
+                Console.WriteLine($"[HuggingFace] Attempt {attempt}/{maxRetries} - HTTP Status: {(int)response.StatusCode} {response.StatusCode}");
+                Console.WriteLine($"[HuggingFace] Raw Response: {content}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    using var successDoc = System.Text.Json.JsonDocument.Parse(content);
+                    var root = successDoc.RootElement;
+
+                    if (!root.TryGetProperty("choices", out var choices) || choices.GetArrayLength() == 0)
+                    {
+                        Console.WriteLine("[HuggingFace] No choices in response");
+                        return StatusCode(502, new { error = "Invalid response from HuggingFace", detail = content });
+                    }
+
+                    var message = choices[0].GetProperty("message");
+                    var reply = message.GetProperty("content").GetString()?.Trim() ?? string.Empty;
+
+                    // Remove reasoning tags and internal thought processes
+                    reply = System.Text.RegularExpressions.Regex.Replace(reply, @"<think>[\s\S]*?</think>", "", System.Text.RegularExpressions.RegexOptions.IgnoreCase).Trim();
+                    reply = System.Text.RegularExpressions.Regex.Replace(reply, @"<analysis>[\s\S]*?</analysis>", "", System.Text.RegularExpressions.RegexOptions.IgnoreCase).Trim();
+                    
+                    // Remove any leading reasoning markers
+                    reply = System.Text.RegularExpressions.Regex.Replace(reply, @"^(Reasoning|Analysis|Thinking):[\s\S]*?(?=Answer:|$)", "", System.Text.RegularExpressions.RegexOptions.IgnoreCase).Trim();
+                    
+                    // If there's an "Answer:" marker, extract only what follows it
+                    var answerMatch = System.Text.RegularExpressions.Regex.Match(reply, @"Answer:\s*([\s\S]*)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                    if (answerMatch.Success)
+                    {
+                        reply = answerMatch.Groups[1].Value.Trim();
+                    }
+
+                    if (string.IsNullOrWhiteSpace(reply))
+                    {
+                        Console.WriteLine("[HuggingFace] Empty content in response");
+                        return StatusCode(502, new { error = "Empty response from HuggingFace", detail = content });
+                    }
+
+                    Console.WriteLine($"[HuggingFace] Success: {reply.Length} chars");
+                    return Ok(new { reply });
+                }
+
+                lastErrorContent = content;
+                lastStatusCode = (int)response.StatusCode;
+
+                if ((int)response.StatusCode >= 500 && attempt < maxRetries)
+                {
+                    await Task.Delay(250 * attempt);
+                    continue;
+                }
+
+                if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                    return StatusCode(403, new { error = "HuggingFace permission denied (403)", detail = content });
+
+                if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+                    return StatusCode(429, new { error = "HuggingFace rate limit exceeded", detail = content });
+
+                if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                    return StatusCode(400, new { error = "Bad request to HuggingFace", detail = content });
+
                 return StatusCode((int)response.StatusCode, new
                 {
                     error = $"HuggingFace returned {(int)response.StatusCode}",
@@ -94,30 +141,12 @@ public class AiController : ControllerBase
                 });
             }
 
-            // Parse OpenAI-compatible response: { choices: [{ message: { content: "..." } }] }
-            using var successDoc = System.Text.Json.JsonDocument.Parse(content);
-            var root = successDoc.RootElement;
-
-            if (!root.TryGetProperty("choices", out var choices) || choices.GetArrayLength() == 0)
+            return StatusCode(502, new
             {
-                Console.WriteLine("[HuggingFace] No choices in response");
-                return StatusCode(502, new { error = "Invalid response from HuggingFace", detail = content });
-            }
-
-            var message = choices[0].GetProperty("message");
-            var reply = message.GetProperty("content").GetString()?.Trim() ?? string.Empty;
-
-            // Strip <think>...</think> blocks from DeepSeek reasoning models
-            reply = System.Text.RegularExpressions.Regex.Replace(reply, @"<think>[\s\S]*?</think>", "").Trim();
-
-            if (string.IsNullOrWhiteSpace(reply))
-            {
-                Console.WriteLine("[HuggingFace] Empty content in response");
-                return StatusCode(502, new { error = "Empty response from HuggingFace", detail = content });
-            }
-
-            Console.WriteLine($"[HuggingFace] Success: {reply.Length} chars");
-            return Ok(new { reply });
+                error = "HuggingFace service temporarily unavailable after retries",
+                detail = lastErrorContent,
+                status = lastStatusCode
+            });
         }
         catch (HttpRequestException ex)
         {

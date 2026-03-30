@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { http } from "../../api/http";
 import { endpoints } from "../../api/endpoints";
-import HPBar from "../../components/HPBar";
+import BattleScene from "../../components/game/BattleScene";
+import VictoryModal from "../../components/game/VictoryModal";
 import Modal from "../../components/Modal";
 import styles from "../../styles/quizBattle.module.css";
 
@@ -19,11 +20,17 @@ export default function Quiz() {
 
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState(null);
+  const [showVictory, setShowVictory] = useState(false);
+  const [resultData, setResultData] = useState(null);
   const [error, setError] = useState("");
   const [playerHp, setPlayerHp] = useState(100);
   const [enemyHp, setEnemyHp] = useState(100);
   const [lastPlayerHit, setLastPlayerHit] = useState(0);
   const [lastEnemyHit, setLastEnemyHit] = useState(0);
+  const [battleEvent, setBattleEvent] = useState(null);
+  const [battleLog, setBattleLog] = useState(["Battle started. Choose your answer!"]);
+  const battleEventIdRef = useRef(0);
+  const logRef = useRef(null);
   const currentQuestion = useMemo(() => questions[currentIndex], [questions, currentIndex]);
   const storageKey = useMemo(() => `cq_quiz_progress_${quizId}`, [quizId]);
   const [resumeOpen, setResumeOpen] = useState(false);
@@ -62,6 +69,11 @@ export default function Quiz() {
     } catch {}
   }, [storageKey]);
 
+  useEffect(() => {
+    if (!logRef.current) return;
+    logRef.current.scrollTop = logRef.current.scrollHeight;
+  }, [battleLog]);
+
   if (!quizId) {
     return (
       <div style={{ padding: 24, color: "red" }}>
@@ -96,6 +108,20 @@ export default function Quiz() {
     );
   }
 
+  function emitBattleEvent(check, damageToEnemy, damageToPlayer) {
+    const correct = Boolean(check.correct ?? check.Correct);
+    setBattleEvent({
+      id: battleEventIdRef.current++,
+      correct,
+      damageToEnemy,
+      damageToPlayer,
+    });
+  }
+
+  function pushBattleLog(message) {
+    setBattleLog(prev => [...prev, message]);
+  }
+
   function choose(option) {
     setSelected(option);
     saveProgress({ selected: option });
@@ -112,8 +138,13 @@ export default function Quiz() {
       });
       const toEnemy = check.damageToEnemy ?? check.DamageToEnemy ?? 0;
       const toPlayer = check.damageToPlayer ?? check.DamageToPlayer ?? 0;
+      const correct = Boolean(check.correct ?? check.Correct);
       setEnemyHp(hp => Math.max(0, hp - toEnemy));
       setPlayerHp(hp => Math.max(0, hp - toPlayer));
+      emitBattleEvent(check, toEnemy, toPlayer);
+      pushBattleLog(`Q${currentIndex + 1}: ${correct ? "Correct" : "Wrong"}.`);
+      if (toEnemy > 0) pushBattleLog(`You dealt ${toEnemy} damage to Slime.`);
+      if (toPlayer > 0) pushBattleLog(`Slime dealt ${toPlayer} damage to you.`);
       setLastEnemyHit(toEnemy);
       setLastPlayerHit(toPlayer);
       setTimeout(() => { setLastEnemyHit(0); setLastPlayerHit(0); }, 700);
@@ -145,8 +176,13 @@ export default function Quiz() {
           });
           const toEnemy = check.damageToEnemy ?? check.DamageToEnemy ?? 0;
           const toPlayer = check.damageToPlayer ?? check.DamageToPlayer ?? 0;
+          const correct = Boolean(check.correct ?? check.Correct);
           setEnemyHp(hp => Math.max(0, hp - toEnemy));
           setPlayerHp(hp => Math.max(0, hp - toPlayer));
+          emitBattleEvent(check, toEnemy, toPlayer);
+          pushBattleLog(`Q${currentIndex + 1}: ${correct ? "Correct" : "Wrong"}.`);
+          if (toEnemy > 0) pushBattleLog(`You dealt ${toEnemy} damage to Slime.`);
+          if (toPlayer > 0) pushBattleLog(`Slime dealt ${toPlayer} damage to you.`);
           setLastEnemyHit(toEnemy);
           setLastPlayerHit(toPlayer);
           setTimeout(() => { setLastEnemyHit(0); setLastPlayerHit(0); }, 700);
@@ -162,7 +198,50 @@ export default function Quiz() {
       };
 
       const res = await http.post(endpoints.submitAttempt, payload);
+      const rResult = res.result ?? res.Result;
+      const rScore = res.score ?? res.Score ?? 0;
+      const rTotal = res.totalQuestions ?? res.TotalQuestions ?? questions.length;
+      const rPlayerHp = res.playerHp ?? res.PlayerHp ?? playerHp;
+      const rEnemyHp = res.enemyHp ?? res.EnemyHp ?? enemyHp;
+      const totalDamageDealt = Math.max(0, 100 - rEnemyHp);
+      const totalDamageTaken = Math.max(0, 100 - rPlayerHp);
+      const accuracy = Math.round((rScore / Math.max(1, rTotal)) * 100);
+      const resultAnswers = res.answers ?? res.Answers ?? [];
+      const questionReview = (questions || []).map((question) => {
+        const selectedAnswer = finalAnswers[question.id];
+        const answerInfo = resultAnswers.find(a => (a.questionId ?? a.QuestionId) === question.id);
+        const correctAnswer = (answerInfo?.correctAnswer ?? answerInfo?.CorrectAnswer ?? "").toUpperCase();
+        const isCorrect = Boolean(
+          selectedAnswer &&
+          correctAnswer &&
+          selectedAnswer.toUpperCase() === correctAnswer
+        );
+
+        return {
+          id: question.id,
+          text: question.text,
+          selectedAnswer,
+          correctAnswer,
+          isCorrect,
+        };
+      });
+
+      pushBattleLog(rResult === "Victory" ? "Battle finished: Victory!" : "Battle finished: Defeat.");
       setResult(res);
+      setResultData({
+        score: rScore,
+        totalQuestions: rTotal,
+        accuracy,
+        totalDamageDealt,
+        totalDamageTaken,
+        finalHP: {
+          player: rPlayerHp,
+          enemy: rEnemyHp,
+        },
+        questionReview,
+        result: rResult,
+      });
+      setShowVictory(true);
       clearProgress();
     } catch (err) {
       setError(err.message || "Submission failed");
@@ -207,75 +286,15 @@ export default function Quiz() {
     setCurrentIndex(0);
     setPlayerHp(100);
     setEnemyHp(100);
+    setBattleLog(["Battle restarted. Choose your answer!"]);
     setResumeOpen(false);
   }
 
-  if (result) {
-    const rResult = result.result ?? result.Result;
-    const rScore = result.score ?? result.Score ?? 0;
-    const rTotal = result.totalQuestions ?? result.TotalQuestions ?? questions.length;
-    const rPlayerHp = result.playerHp ?? result.PlayerHp ?? playerHp;
-    const rEnemyHp = result.enemyHp ?? result.EnemyHp ?? enemyHp;
-    const isVictory = rResult === "Victory";
-    const totalDamageDealt = 100 - rEnemyHp;
-    const totalDamageTaken = 100 - rPlayerHp;
-    const resultAnswers = result.answers ?? result.Answers ?? [];
-    return (
-      <div className="page container">
-        <div className={`${styles.resultBanner} ${isVictory ? styles.success : styles.fail}`}>
-          {isVictory ? "Victory ✅" : "Defeat ❌"}
-        </div>
-        <div className={styles.resultGrid}>
-          <div className={styles.resultCard}>
-            <div className={styles.resultValue}>{rScore} / {rTotal}</div>
-            <div className={styles.resultLabel}>Score</div>
-          </div>
-          <div className={styles.resultCard}>
-            <div className={styles.resultValue}>{Math.round((rScore / Math.max(1, rTotal)) * 100)}%</div>
-            <div className={styles.resultLabel}>Accuracy</div>
-          </div>
-          <div className={styles.resultCard}>
-            <div className={styles.resultValue}>{Math.max(0, totalDamageDealt)}</div>
-            <div className={styles.resultLabel}>Total Damage Dealt</div>
-          </div>
-          <div className={styles.resultCard}>
-            <div className={styles.resultValue}>{Math.max(0, totalDamageTaken)}</div>
-            <div className={styles.resultLabel}>Total Damage Taken</div>
-          </div>
-          <div className={styles.resultCard}>
-            <div className={styles.resultValue}>{rPlayerHp} vs {rEnemyHp}</div>
-            <div className={styles.resultLabel}>Final HP (You vs Enemy)</div>
-          </div>
-        </div>
-        <div className={styles.reviewSection}>
-          <h3>Question Review</h3>
-          {(questions || []).map((q) => {
-            const selectedAnswer = answers[q.id];
-            const answerInfo = resultAnswers.find(a => (a.questionId ?? a.QuestionId) === q.id);
-            const correct = (answerInfo?.correctAnswer ?? answerInfo?.CorrectAnswer ?? "").toUpperCase();
-            const isCorrect = selectedAnswer && correct && selectedAnswer.toUpperCase() === correct;
-            return (
-              <div key={q.id} className={styles.reviewCard}>
-                <div className={styles.reviewHeader}>
-                  <div>{q.text}</div>
-                  <span className={isCorrect ? styles.badgeSuccess : styles.badgeFail}>
-                    {isCorrect ? "Correct" : "Incorrect"}
-                  </span>
-                </div>
-                <div className={styles.reviewMeta}>
-                  Selected: {selectedAnswer ?? "—"} • Correct: {correct || "—"}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        <div className={styles.resultActions}>
-          <button className="btn" onClick={() => nav(`/quiz/${quizId}`)}>Retry Quiz</button>
-          <button className="btn" onClick={() => nav("/lessons")}>Back to Lesson</button>
-          {nextLessonId ? <button className="btn btn-primary" onClick={() => nav(`/lesson/${nextLessonId}`)}>Next Lesson</button> : null}
-        </div>
-      </div>
-    );
+  function restartQuiz() {
+    setShowVictory(false);
+    setResult(null);
+    setResultData(null);
+    restartProgress();
   }
 
 
@@ -296,47 +315,84 @@ export default function Quiz() {
       >
         <p>We found saved progress for this quiz. Do you want to continue from where you left off?</p>
       </Modal>
+      <VictoryModal
+        isOpen={showVictory}
+        resultData={resultData}
+        onClose={() => setShowVictory(false)}
+        onRetry={restartQuiz}
+        onReturn={() => {
+          setShowVictory(false);
+          nav("/lessons");
+        }}
+        nextLessonId={nextLessonId}
+        onNextLesson={() => {
+          if (!nextLessonId) return;
+          setShowVictory(false);
+          nav(`/lesson/${nextLessonId}`);
+        }}
+      />
       <div className={styles.wrap}>
-        <div className={styles.topBars}>
-          <HPBar label="Player HP" value={playerHp} max={100} color="#10b981" hit={lastPlayerHit > 0} damage={lastPlayerHit} />
-          <HPBar label="Enemy HP" value={enemyHp} max={100} color="#ef4444" hit={lastEnemyHit > 0} damage={lastEnemyHit} />
-        </div>
-        <div className={styles.questionCard}>
-          <div className={styles.titleRow}>
-            <h2>Question {currentIndex + 1} / {questions.length}</h2>
-            <span className="badge">Damage: {q.damage}</span>
+        <div className={styles.quizLayout}>
+          <div className={styles.battlePanel}>
+            {/* Battle Scene with Sprite Animations */}
+            <BattleScene
+              playerHP={playerHp}
+              enemyHP={enemyHp}
+              battleEvent={battleEvent}
+              showResult={false}
+            />
           </div>
-          <p className={styles.question}>{q.text}</p>
-          <div className={styles.damageMeta}>Choose an answer to deal damage.</div>
-          <div className={styles.choices}>
-            {["A", "B", "C", "D"].map(opt => (
-              <button
-                key={opt}
-                onClick={() => choose(opt)}
-                className={`${styles.choiceBtn} ${selected === opt ? styles.selected : ""}`}
-              >
-                {opt}: {q[`option${opt}`]}
-              </button>
+
+          <div className={styles.questionPanel}>
+            <div className={styles.questionCard}>
+              <div className={styles.titleRow}>
+                <h2>Question {currentIndex + 1} / {questions.length}</h2>
+                <span className="badge">Damage: {q.damage}</span>
+              </div>
+              <p className={styles.question}>{q.text}</p>
+              <div className={styles.damageMeta}>Choose an answer to deal damage.</div>
+              <div className={styles.choices}>
+                {["A", "B", "C", "D"].map(opt => (
+                  <button
+                    key={opt}
+                    onClick={() => choose(opt)}
+                    className={`${styles.choiceBtn} ${selected === opt ? styles.selected : ""}`}
+                  >
+                    {opt}: {q[`option${opt}`]}
+                  </button>
+                ))}
+              </div>
+              <div className={styles.actions}>
+                {currentIndex < questions.length - 1 ? (
+                  <button className="btn btn-primary" disabled={!selected} onClick={nextQuestion}>
+                    Next
+                  </button>
+                ) : (
+                  <button className="btn btn-primary" disabled={!selected || submitting} onClick={submitQuiz}>
+                    {submitting ? "Submitting…" : "Finish Quiz"}
+                  </button>
+                )}
+              </div>
+              {(lastEnemyHit > 0 || lastPlayerHit > 0) ? (
+                <div className={styles.feedback}>
+                  {lastEnemyHit > 0 ? <span className={styles.enemyHit}>You dealt {lastEnemyHit}!</span> : null}
+                  {" "}
+                  {lastPlayerHit > 0 ? <span className={styles.playerHit}>You took {lastPlayerHit}!</span> : null}
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.battleLogPanel}>
+          <div className={styles.battleLogHeader}>Battle Log</div>
+          <div className={styles.battleLogBody} ref={logRef}>
+            {battleLog.map((line, idx) => (
+              <div key={`${idx}-${line}`} className={styles.battleLogLine}>
+                <span className={styles.battleLogMarker}>{">"}</span> {line}
+              </div>
             ))}
           </div>
-          <div className={styles.actions}>
-            {currentIndex < questions.length - 1 ? (
-              <button className="btn btn-primary" disabled={!selected} onClick={nextQuestion}>
-                Next
-              </button>
-            ) : (
-              <button className="btn btn-primary" disabled={!selected || submitting} onClick={submitQuiz}>
-                {submitting ? "Submitting…" : "Finish Quiz"}
-              </button>
-            )}
-          </div>
-          {(lastEnemyHit > 0 || lastPlayerHit > 0) ? (
-            <div className={styles.feedback}>
-              {lastEnemyHit > 0 ? <span className={styles.enemyHit}>You dealt {lastEnemyHit}!</span> : null}
-              {" "}
-              {lastPlayerHit > 0 ? <span className={styles.playerHit}>You took {lastPlayerHit}!</span> : null}
-            </div>
-          ) : null}
         </div>
       </div>
     </div>

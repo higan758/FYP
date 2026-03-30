@@ -17,7 +17,6 @@ export default function VerifyEmail() {
 
       setStatus("Verification email resent. Please check your inbox.");
     } catch (err) {
-      // backend may not exist yet — handle gracefully
       setStatus(
         "If your account exists, a verification email will be sent shortly."
       );
