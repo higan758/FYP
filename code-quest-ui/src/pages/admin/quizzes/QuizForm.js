@@ -5,7 +5,14 @@ import styles from "../../../styles/adminQuizzes.module.css";
 
 export default function QuizForm({ lessons, onCreated }) {
   const lessonOptions = useMemo(
-    () => (Array.isArray(lessons) ? lessons : []),
+    () => {
+      const list = Array.isArray(lessons) ? [...lessons] : [];
+      return list.sort((a, b) => {
+        const aLevel = a.level ?? a.levelNumber ?? a.Level ?? a.LevelNumber ?? 0;
+        const bLevel = b.level ?? b.levelNumber ?? b.Level ?? b.LevelNumber ?? 0;
+        return aLevel - bLevel;
+      });
+    },
     [lessons]
   );
 
@@ -43,7 +50,7 @@ export default function QuizForm({ lessons, onCreated }) {
             <option value="" disabled>Select a lesson</option>
             {lessonOptions.map((l) => (
               <option key={l.id} value={l.id}>
-                {l.title} (Level {l.levelNumber})
+                {l.title} (Level {l.level ?? l.levelNumber ?? l.Level ?? l.LevelNumber ?? 0})
               </option>
             ))}
           </select>

@@ -48,6 +48,15 @@ export default function Lessons() {
     return map;
   }, [unlocked]);
 
+  const sortedLessons = useMemo(() => {
+    const list = Array.isArray(lessons) ? [...lessons] : [];
+    return list.sort((a, b) => {
+      const aLevel = a.level ?? a.levelNumber ?? a.Level ?? a.LevelNumber ?? 0;
+      const bLevel = b.level ?? b.levelNumber ?? b.Level ?? b.LevelNumber ?? 0;
+      return aLevel - bLevel;
+    });
+  }, [lessons]);
+
   const completedLessonIds = useMemo(() => {
     const set = new Set();
 
@@ -140,7 +149,7 @@ export default function Lessons() {
 
       <div className={styles.content}>
         <div className={styles.grid}>
-          {lessons.map((lesson) => {
+          {sortedLessons.map((lesson) => {
             const isCompleted = completedLessonIds.has(lesson.id);
             const isLocked = !isCompleted && (lockMap.get(lesson.id) ?? true);
             const status = isCompleted ? "completed" : isLocked ? "locked" : "unlocked";

@@ -4,7 +4,14 @@ import { endpoints } from "../../../api/endpoints";
 import styles from "../../../styles/adminLessons.module.css";
 
 export default function LessonList({ lessons, onDelete }) {
-  const list = useMemo(() => Array.isArray(lessons) ? lessons : [], [lessons]);
+  const list = useMemo(() => {
+    const source = Array.isArray(lessons) ? [...lessons] : [];
+    return source.sort((a, b) => {
+      const aLevel = a.level ?? a.levelNumber ?? a.Level ?? a.LevelNumber ?? 0;
+      const bLevel = b.level ?? b.levelNumber ?? b.Level ?? b.LevelNumber ?? 0;
+      return aLevel - bLevel;
+    });
+  }, [lessons]);
   const [editLesson, setEditLesson] = useState(null);
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState("");
@@ -131,7 +138,7 @@ function LessonCard({ l, onEdit, onDelete }) {
     <div className={styles.lessonCard}>
       {/* Card header */}
       <div className={styles.cardHeader}>
-        <div className={styles.cardLevel}>Level {l.levelNumber}</div>
+        <div className={styles.cardLevel}>Level {l.level ?? l.levelNumber ?? l.Level ?? l.LevelNumber ?? 0}</div>
         <div className={styles.cardQuizBadge}>
           {Array.isArray(l.quizzes) ? l.quizzes.length : 0} quiz{(Array.isArray(l.quizzes) ? l.quizzes.length : 0) !== 1 ? "zes" : ""}
         </div>

@@ -17,6 +17,7 @@ public class LessonRepository : ILessonRepository
     public async Task<List<Lesson>> GetAllAsync()
     {
         return await _context.Lessons
+            .OrderBy(l => l.LevelNumber)
             .Include(l => l.Quizzes)
                 .ThenInclude(q => q.Questions)
             .ToListAsync();
