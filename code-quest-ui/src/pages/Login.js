@@ -49,41 +49,46 @@ export default function Login() {
   }
 
   return (
-    <div className="auth-wrap">
-      <h1>Login</h1>
+    <div className="auth-page">
+      <div className="auth-wrap">
+        <div className="auth-header">
+          <h1>Login</h1>
+          <p>Continue your learning journey in CodeQuest.</p>
+        </div>
 
-      <form onSubmit={onSubmit}>
-        <div className="auth-field">
-          <label>Email or Username</label>
-          <input
-            value={emailOrUsername}
-            onChange={(e) => setEmailOrUsername(e.target.value)}
-            autoComplete="username"
+        <form onSubmit={onSubmit}>
+          <div className="auth-field">
+            <label>Email or Username</label>
+            <input
+              value={emailOrUsername}
+              onChange={(e) => setEmailOrUsername(e.target.value)}
+              autoComplete="username"
+            />
+          </div>
+
+          <PasswordInput
+            label="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
           />
-        </div>
 
-        <PasswordInput
-          label="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          autoComplete="current-password"
-        />
+          <div className="auth-actions">
+            <button type="submit" className="btn btn-primary">Login</button>
+            <span>
+              No account? <Link to="/register">Register</Link>
+            </span>
+          </div>
 
-        <div className="auth-actions">
-          <button type="submit" className="btn btn-primary">Login</button>
-          <span>
-            No account? <Link to="/register">Register</Link>
-          </span>
-        </div>
+          {err ? <div className="auth-error">{err}</div> : null}
+        </form>
 
-        {err ? <div className="auth-error">{err}</div> : null}
-      </form>
+        <div className="auth-divider"><span>or</span></div>
 
-      <div className="auth-divider"><span>or</span></div>
+        <GoogleLoginButton onSuccess={handleGoogleSuccess} onError={handleGoogleError} />
 
-      <GoogleLoginButton onSuccess={handleGoogleSuccess} onError={handleGoogleError} />
-
-      {toastMsg ? <Toast message={toastMsg} onClose={() => setToastMsg("")} /> : null}
+        {toastMsg ? <Toast message={toastMsg} onClose={() => setToastMsg("")} /> : null}
+      </div>
     </div>
   );
 }

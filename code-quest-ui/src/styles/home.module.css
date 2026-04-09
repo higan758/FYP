@@ -3,7 +3,10 @@
 .pageContainer {
   width: 100%;
   min-height: 100vh;
-  background-color: var(--color-bg-primary);
+  background:
+    radial-gradient(1000px 460px at 10% -8%, rgba(99, 102, 241, 0.08), transparent 62%),
+    radial-gradient(900px 420px at 90% -12%, rgba(14, 165, 233, 0.06), transparent 58%),
+    var(--color-bg-primary);
   display: flex;
   flex-direction: column;
   gap: var(--space-2xl);
@@ -14,10 +17,7 @@
 .hero {
   position: relative;
   overflow: hidden;
-  padding: var(--space-3xl) var(--space-lg) var(--space-2xl);
-  background:
-    radial-gradient(1200px 500px at 10% -10%, rgba(124, 58, 237, 0.08), transparent),
-    radial-gradient(1200px 500px at 90% -20%, rgba(14, 165, 233, 0.06), transparent);
+  padding: var(--space-2xl) var(--space-lg) var(--space-xl);
 }
 
 .hero::before {
@@ -27,7 +27,7 @@
   background:
     repeating-linear-gradient(90deg, rgba(124, 58, 237, 0.06) 0 2px, transparent 2px 28px),
     repeating-linear-gradient(0deg, rgba(14, 165, 233, 0.04) 0 2px, transparent 2px 28px);
-  opacity: 0.35;
+  opacity: 0.2;
   pointer-events: none;
 }
 
@@ -39,6 +39,23 @@
   flex-direction: column;
   gap: var(--space-lg);
   animation: fadeUp 0.6s ease-out;
+  background-color: rgba(255, 255, 255, 0.78);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-2xl);
+  backdrop-filter: blur(4px);
+}
+
+.heroEyebrow {
+  display: inline-flex;
+  width: fit-content;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  color: var(--color-primary-dark);
+  background: var(--color-primary-light);
+  font-weight: var(--font-weight-semibold);
 }
 
 .heroTitle {
@@ -69,6 +86,22 @@
   gap: var(--space-md);
   flex-wrap: wrap;
   margin-top: var(--space-sm);
+}
+
+.heroMeta {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.heroMeta span {
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg-card);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
 }
 
 /* ── Features Section ─────────────────────────────── */
@@ -248,10 +281,20 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: var(--space-lg);
-  max-width: 800px;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 0 var(--space-lg);
+  padding: 0;
   animation: fadeUp 0.75s ease-out;
+}
+
+.statsSection {
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
 }
 
 .statCard {
@@ -266,7 +309,8 @@
 
 .statCard:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-primary);
 }
 
 .statValue {
@@ -301,6 +345,10 @@
     padding: var(--space-2xl) var(--space-lg) var(--space-xl);
   }
 
+  .heroInner {
+    padding: var(--space-lg);
+  }
+
   .featuresGrid {
     grid-template-columns: 1fr;
   }
@@ -311,5 +359,9 @@
 
   .statsRow {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .statsSection {
+    padding: 0 var(--space-lg);
   }
 }

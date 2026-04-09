@@ -132,8 +132,11 @@ export default function Profile() {
   return (
     <div className={styles.pageContainer}>
       {notification && <div className={styles.notification}>{notification}</div>}
+      <section className={styles.pageIntro}>
+        <h1>My Profile</h1>
+        <p>Track your progress, rank, and learning stats in one place.</p>
+      </section>
 
-      {/* ── IG-style top section ──────────── */}
       <div className={styles.profileHeader}>
         {/* Avatar */}
         <div className={styles.avatarCol}>
@@ -206,7 +209,6 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* ── Rank Banner ──────────────────── */}
       <div className={styles.rankBanner}>
         <div className={`${styles.rankBadgeCard} ${rank && rank <= 3 ? styles[`rank${rank}`] : ""}`}>
           <div className={styles.rankIcon}>{rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : "🏆"}</div>
@@ -218,10 +220,9 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* ── Tabs-style detail cards ─────── */}
       <div className={styles.detailGrid}>
         <div className={styles.detailCard}>
-          <h3>⚔️ Battle Progress</h3>
+          <h3>Battle Progress</h3>
           <div className={styles.progressItem}>
             <div className={styles.progressLabel}>Battles Completed</div>
             <div className={styles.progressBarWrap}>
@@ -243,7 +244,7 @@ export default function Profile() {
         </div>
 
         <div className={styles.detailCard}>
-          <h3>📊 Stats Overview</h3>
+          <h3>Stats Overview</h3>
           <div className={styles.miniStats}>
             <div className={styles.miniStat}>
               <div className={styles.miniStatVal}>{quizzesTotal}</div>

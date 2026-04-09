@@ -47,6 +47,12 @@ export default function LessonDetail() {
         </div>
         <div className={styles.headerRight}>
           <button
+            className={`btn btn-secondary ${styles.backBtn}`}
+            onClick={() => nav("/lessons")}
+          >
+            Back to Lessons
+          </button>
+          <button
             className={`btn btn-primary ${styles.quizBtn}`}
             disabled={!quizId}
             onClick={() => nav(`/quiz/${quizId}`)}

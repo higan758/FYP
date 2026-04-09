@@ -42,49 +42,54 @@ export default function Register() {
   }
 
   return (
-    <div className="auth-wrap">
-      <h1>Register</h1>
-
-      <form onSubmit={onSubmit}>
-        <div className="auth-field">
-          <label>Full Name</label>
-          <input value={fullName} onChange={(e) => setFullName(e.target.value)} />
+    <div className="auth-page">
+      <div className="auth-wrap">
+        <div className="auth-header">
+          <h1>Create Account</h1>
+          <p>Join CodeQuest and start leveling up your C# skills.</p>
         </div>
 
-        <div className="auth-field">
-          <label>Username</label>
-          <input value={userName} onChange={(e) => setUserName(e.target.value)} />
-        </div>
+        <form onSubmit={onSubmit}>
+          <div className="auth-field">
+            <label>Full Name</label>
+            <input value={fullName} onChange={(e) => setFullName(e.target.value)} />
+          </div>
 
-        <div className="auth-field">
-          <label>Email</label>
-          <input
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            autoComplete="email"
+          <div className="auth-field">
+            <label>Username</label>
+            <input value={userName} onChange={(e) => setUserName(e.target.value)} />
+          </div>
+
+          <div className="auth-field">
+            <label>Email</label>
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+            />
+          </div>
+
+          <PasswordInput
+            label="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="new-password"
           />
-        </div>
 
-        <PasswordInput
-          label="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          autoComplete="new-password"
-        />
+          <div className="auth-actions">
+            <button type="submit" className="btn btn-primary">Create Account</button>
+            <span>
+              Have an account? <Link to="/login">Login</Link>
+            </span>
+          </div>
 
-        <div className="auth-actions">
-          <button type="submit" className="btn btn-primary">Create Account</button>
-          <span>
-            Have an account? <Link to="/login">Login</Link>
-          </span>
-        </div>
+          {err ? <div className="auth-error">{err}</div> : null}
+        </form>
 
-        {err ? <div className="auth-error">{err}</div> : null}
-      </form>
+        <div className="auth-divider"><span>or</span></div>
 
-      <div className="auth-divider"><span>or</span></div>
-
-      <GoogleLoginButton onSuccess={handleGoogleSuccess} onError={handleGoogleError} />
+        <GoogleLoginButton onSuccess={handleGoogleSuccess} onError={handleGoogleError} />
+      </div>
     </div>
   );
 }

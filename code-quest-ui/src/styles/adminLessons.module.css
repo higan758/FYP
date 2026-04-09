@@ -18,14 +18,14 @@
 .pageTitle {
   font-size: var(--font-size-2xl, 1.75rem);
   font-weight: 800;
-  color: var(--color-text, #1e293b);
+  color: var(--color-text-primary, #0f172a);
   margin: 0;
 }
 
 .pageSubtitle {
   font-size: var(--font-size-sm, 0.875rem);
-  color: var(--color-muted, #94a3b8);
-  background: var(--color-primary-light, #ede9fe);
+  color: var(--color-text-secondary, #64748b);
+  background: #ede9fe;
   padding: 2px 10px;
   border-radius: var(--radius-full, 9999px);
   font-weight: 600;
@@ -48,12 +48,12 @@
   border: 1px solid var(--color-border, #e2e8f0);
   border-radius: var(--radius-xl, 16px);
   padding: var(--space-5, 1.25rem);
-  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.06));
-  transition: box-shadow 0.2s;
+  box-shadow: var(--shadow-md, 0 4px 20px rgba(0,0,0,0.05));
+  transition: all 0.2s ease;
 }
 
 .formCard:hover {
-  box-shadow: var(--shadow-md, 0 4px 12px rgba(0,0,0,0.08));
+  box-shadow: var(--shadow-lg, 0 10px 25px rgba(0,0,0,0.08));
 }
 
 .formCardTitle {
@@ -104,8 +104,8 @@
 }
 
 .input:focus {
-  border-color: var(--color-primary, #7c3aed);
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+  border-color: var(--color-primary, #6366f1);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
 
 .textareaField {
@@ -123,8 +123,8 @@
 }
 
 .textareaField:focus {
-  border-color: var(--color-primary, #7c3aed);
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+  border-color: var(--color-primary, #6366f1);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
 
 /* ========== Loading State ========== */
@@ -197,13 +197,13 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3, 0.75rem);
-  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.06));
-  transition: transform 0.15s, box-shadow 0.2s;
+  box-shadow: var(--shadow-md, 0 4px 20px rgba(0,0,0,0.05));
+  transition: all 0.2s ease;
 }
 
 .lessonCard:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg, 0 8px 24px rgba(0,0,0,0.1));
+  transform: scale(1.02);
+  box-shadow: var(--shadow-lg, 0 10px 25px rgba(0,0,0,0.08));
 }
 
 .cardHeader {
@@ -217,8 +217,8 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  background: linear-gradient(135deg, var(--color-primary, #7c3aed), var(--color-accent, #0ea5e9));
-  color: #fff;
+  background: #ede9fe;
+  color: #6366f1;
   padding: 2px 10px;
   border-radius: var(--radius-full, 9999px);
 }
@@ -289,7 +289,7 @@
 
 .uploadError {
   font-size: var(--font-size-xs, 0.75rem);
-  color: #dc2626;
+  color: #ef4444;
   padding: 2px 0;
 }
 

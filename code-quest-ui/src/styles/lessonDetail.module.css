@@ -16,10 +16,11 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-lg);
-  padding: var(--space-xl) var(--space-2xl);
-  background: linear-gradient(135deg, var(--color-primary-light), var(--color-accent-light));
+  padding: var(--space-xl);
+  background-color: var(--color-bg-card);
   border-radius: var(--radius-2xl);
-  border: 1px solid var(--color-border-light);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-md);
 }
 
 .headerLeft {
@@ -30,6 +31,16 @@
 
 .headerRight {
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.backBtn {
+  padding: var(--space-md) var(--space-lg) !important;
+  font-size: var(--font-size-base) !important;
 }
 
 .levelBadge {
@@ -37,7 +48,7 @@
   align-items: center;
   gap: var(--space-xs);
   padding: var(--space-xs) var(--space-md);
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
   color: white;
   border-radius: var(--radius-full);
   font-size: var(--font-size-xs);
@@ -86,7 +97,7 @@
   gap: var(--space-sm);
   padding-bottom: var(--space-sm);
   margin-bottom: var(--space-sm);
-  border-bottom: 1px solid var(--color-border-light);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .paneIcon {
@@ -96,7 +107,7 @@
 .paneTitle {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-text-secondary);
+  color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -137,6 +148,10 @@
   }
   .title {
     font-size: var(--font-size-2xl);
+  }
+  .headerRight {
+    width: 100%;
+    justify-content: flex-start;
   }
   .page {
     padding: var(--space-md);

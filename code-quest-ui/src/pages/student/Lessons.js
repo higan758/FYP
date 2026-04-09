@@ -117,16 +117,30 @@ export default function Lessons() {
     };
   }, [completedLessonIds, lessons, lockMap]);
 
+  const completionPct = useMemo(() => {
+    if (!lessonStats.total) return 0;
+    return Math.round((lessonStats.completed / lessonStats.total) * 100);
+  }, [lessonStats]);
+
   if (loading) return <div className={styles.loadingContainer}>Loading lessons…</div>;
   if (error) return <div className={styles.errorContainer}>{error}</div>;
 
   return (
     <div className={styles.pageContainer}>
       <div className={styles.overlay} />
-      
+
       <div className={styles.header}>
-        <h1>📚 C# Learning Path</h1>
+        <h1>C# Learning Path</h1>
         <p>Master C# through interactive lessons and quizzes</p>
+        <div className={styles.progressOverview}>
+          <div className={styles.progressOverviewHead}>
+            <span>Your journey progress</span>
+            <strong>{completionPct}%</strong>
+          </div>
+          <div className={styles.progressOverviewTrack}>
+            <div className={styles.progressOverviewFill} style={{ width: `${completionPct}%` }} />
+          </div>
+        </div>
         <div className={styles.summaryRow}>
           <div className={styles.summaryChip}>
             <span className={styles.summaryValue}>{lessonStats.completed}</span>
@@ -148,6 +162,10 @@ export default function Lessons() {
       </div>
 
       <div className={styles.content}>
+        <div className={styles.sectionHead}>
+          <h2>Lessons</h2>
+          <span>{lessonStats.total} total</span>
+        </div>
         <div className={styles.grid}>
           {sortedLessons.map((lesson) => {
             const isCompleted = completedLessonIds.has(lesson.id);

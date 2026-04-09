@@ -11,6 +11,7 @@ export default function Home() {
       {/* ── Hero ─────────────────────────────── */}
       <section className={styles.hero}>
         <div className={styles.heroInner}>
+          <span className={styles.heroEyebrow}>Interactive C# Learning Platform</span>
           <h1 className={styles.heroTitle}>
             Level Up Your C# Skills with{" "}
             <span className={styles.heroTitleAccent}>CodeQuest</span>
@@ -32,11 +33,20 @@ export default function Home() {
               </Link>
             )}
           </div>
+          <div className={styles.heroMeta}>
+            <span>Hands-on lessons</span>
+            <span>Battle quizzes</span>
+            <span>Live leaderboard</span>
+          </div>
         </div>
       </section>
 
-      {/* ── Stats ────────────────────────────── */}
-      <div className={styles.statsRow}>
+      <section className={styles.statsSection}>
+        <div className={styles.sectionHeader}>
+          <h2>Quick Snapshot</h2>
+          <p>Everything you need to stay motivated while learning C#.</p>
+        </div>
+        <div className={styles.statsRow}>
         <div className={styles.statCard}>
           <div className={styles.statValue}>4+</div>
           <div className={styles.statLabel}>Lesson Levels</div>
@@ -54,6 +64,7 @@ export default function Home() {
           <div className={styles.statLabel}>AI Tutor</div>
         </div>
       </div>
+      </section>
 
       {/* ── Features ─────────────────────────── */}
       <div className={styles.sectionHeader}>
@@ -80,7 +91,7 @@ export default function Home() {
         </div>
         <div className={styles.featureCard}>
           <div className={`${styles.featureIcon} ${styles.featureIconGreen}`}>🏆</div>
-          <h3>Global Leaderboard</h3>
+          <h3>Leaderboard</h3>
           <p>
             Compete with learners worldwide. Climb the ranks and prove your
             C# skills.

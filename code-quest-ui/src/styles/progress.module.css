@@ -68,7 +68,7 @@
 .statItem {
   background-color: var(--color-bg-card);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-2xl);
   padding: var(--space-lg);
   display: flex;
   align-items: center;
@@ -78,8 +78,8 @@
 }
 
 .statItem:hover {
-  transform: translateY(-4px);
-  border-color: var(--color-primary);
+  transform: scale(1.02);
+  border-color: var(--color-border);
   box-shadow: var(--shadow-lg);
 }
 
@@ -107,7 +107,7 @@
 .progressCard {
   background-color: var(--color-bg-card);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-2xl);
   padding: var(--space-2xl);
   box-shadow: var(--shadow-md);
 }
@@ -147,7 +147,7 @@
 .achievementsCard {
   background-color: var(--color-bg-card);
   border: 2px solid #fbbf24;
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-2xl);
   padding: var(--space-2xl);
   box-shadow: var(--shadow-md);
 }
@@ -197,7 +197,7 @@
 .lessonsCard {
   background-color: var(--color-bg-card);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-2xl);
   padding: var(--space-2xl);
   box-shadow: var(--shadow-md);
 }
@@ -245,8 +245,8 @@
 }
 
 .lessonStatus {
-  background-color: var(--color-primary-light);
-  color: var(--color-primary-dark);
+  background-color: #ede9fe;
+  color: #6366f1;
   padding: var(--space-xs) var(--space-md);
   border-radius: var(--radius-full);
   font-size: var(--font-size-sm);
@@ -255,9 +255,9 @@
 }
 
 .lessonStatus.completed {
-  background-color: var(--color-success-light);
-  color: var(--color-success-dark);
-  border-color: var(--color-success);
+  background-color: #dcfce7;
+  color: #22c55e;
+  border-color: #22c55e;
 }
 
 .lessonProgress {

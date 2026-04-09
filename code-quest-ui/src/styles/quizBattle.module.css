@@ -27,18 +27,18 @@
 .battleLogPanel {
   width: min(1320px, 100% - var(--space-xl));
   margin: var(--space-lg) auto 0;
-  background: linear-gradient(180deg, #1f2a35 0%, #141c24 100%);
-  border: 2px solid #53697f;
+  background: #ffffff;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
-  box-shadow: 0 8px 20px rgba(6, 10, 15, 0.35), inset 0 0 0 1px rgba(194, 220, 247, 0.15);
+  box-shadow: var(--shadow-md);
   overflow: hidden;
 }
 
 .battleLogHeader {
   padding: 8px 12px;
-  background: linear-gradient(180deg, #3b4e62 0%, #2b3d50 100%);
-  border-bottom: 1px solid rgba(194, 220, 247, 0.35);
-  color: #e7f3ff;
+  background: #f1f5f9;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-primary);
   font-weight: var(--font-weight-bold);
   font-size: var(--font-size-sm);
   letter-spacing: 0.06em;
@@ -68,13 +68,13 @@
 }
 
 .battleLogLine {
-  color: #d5e7fa;
+  color: var(--color-text-secondary);
   margin-bottom: 4px;
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+  text-shadow: none;
 }
 
 .battleLogMarker {
-  color: #8bc7ff;
+  color: var(--color-secondary);
   font-weight: var(--font-weight-bold);
 }
 
@@ -297,9 +297,9 @@
 }
 
 .badgeSuccess {
-  background-color: var(--color-success-light);
-  color: var(--color-success-dark);
-  border: 1px solid var(--color-success);
+  background-color: #dcfce7;
+  color: #22c55e;
+  border: 1px solid #22c55e;
   border-radius: var(--radius-full);
   padding: var(--space-xs) var(--space-md);
   font-size: var(--font-size-sm);
@@ -307,9 +307,9 @@
 }
 
 .badgeFail {
-  background-color: var(--color-danger-light);
-  color: var(--color-danger-dark);
-  border: 1px solid var(--color-danger);
+  background-color: #fee2e2;
+  color: #ef4444;
+  border: 1px solid #ef4444;
   border-radius: var(--radius-full);
   padding: var(--space-xs) var(--space-md);
   font-size: var(--font-size-sm);

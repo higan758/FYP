@@ -34,13 +34,19 @@ export default function LeaderboardPage() {
   function nameOf(row) { return row.userName || row.UserName; }
   function rankOf(row) { return row.rank ?? row.Rank; }
   function scoreOf(row) { return row.totalScore ?? row.TotalScore; }
+  function initialsOf(name) {
+    const txt = (name || "").trim();
+    if (!txt) return "?";
+    const parts = txt.split(/\s+/).slice(0, 2);
+    return parts.map((p) => p[0]?.toUpperCase() || "").join("") || txt[0].toUpperCase();
+  }
   const myName = user?.userName || user?.email || "";
 
   return (
     <div className={styles.pageContainer}>
       <div className={styles.header}>
-        <h1>⚔️ Grand Leaderboard</h1>
-        <p>Challenge your skills and climb the ranks</p>
+        <h1>Grand Leaderboard</h1>
+        <p>Challenge your skills and climb the ranks.</p>
       </div>
 
       {loading ? (
@@ -53,8 +59,8 @@ export default function LeaderboardPage() {
             <div className={`${styles.podiumItem} ${styles.silver}`}>
               {podium[1] ? (
                 <div className={styles.podiumContent}>
-                  <img src="/rank2.png" alt="2nd place" className={styles.rankBadge} />
-                  <div className={styles.place}>2nd</div>
+                  <div className={styles.avatar}>{initialsOf(nameOf(podium[1]))}</div>
+                  <div className={styles.place}>#2</div>
                   <div className={styles.name}>{nameOf(podium[1])}</div>
                   <div className={styles.score}>{scoreOf(podium[1])} pts</div>
                 </div>
@@ -64,8 +70,9 @@ export default function LeaderboardPage() {
             <div className={`${styles.podiumItem} ${styles.gold}`}>
               {podium[0] ? (
                 <div className={styles.podiumContent}>
-                  <img src="/rank1.png" alt="1st place" className={styles.rankBadge} />
-                  <div className={styles.place}>🏆 Champion 🏆</div>
+                  <div className={styles.crown}>Champion</div>
+                  <div className={styles.avatar}>{initialsOf(nameOf(podium[0]))}</div>
+                  <div className={styles.place}>#1</div>
                   <div className={styles.name}>{nameOf(podium[0])}</div>
                   <div className={styles.score}>{scoreOf(podium[0])} pts</div>
                 </div>
@@ -75,8 +82,8 @@ export default function LeaderboardPage() {
             <div className={`${styles.podiumItem} ${styles.bronze}`}>
               {podium[2] ? (
                 <div className={styles.podiumContent}>
-                  <img src="/rank3.png" alt="3rd place" className={styles.rankBadge} />
-                  <div className={styles.place}>3rd</div>
+                  <div className={styles.avatar}>{initialsOf(nameOf(podium[2]))}</div>
+                  <div className={styles.place}>#3</div>
                   <div className={styles.name}>{nameOf(podium[2])}</div>
                   <div className={styles.score}>{scoreOf(podium[2])} pts</div>
                 </div>
@@ -96,14 +103,20 @@ export default function LeaderboardPage() {
               return (
                 <div key={`${nameOf(row)}-${rankOf(row)}`} className={`${styles.listRow} ${isMe ? styles.meRow : ""}`}>
                   <div className={styles.colRank}>#{rankOf(row)}</div>
-                  <div className={styles.colName}>{nameOf(row)}</div>
+                  <div className={styles.playerCol}>
+                    <div className={styles.listAvatar}>{initialsOf(nameOf(row))}</div>
+                    <div className={styles.colName}>{nameOf(row)}</div>
+                  </div>
                   <div className={styles.colScore}>{scoreOf(row)} pts</div>
                 </div>
               );
             })}
             {me ? (
               <div className={styles.meSummary}>
-                You are ranked <strong>#{me.rank ?? me.Rank}</strong> with <strong>{me.totalScore ?? me.TotalScore}</strong> points.
+                <span className={styles.meIcon}>🏅</span>
+                <span>
+                  You are ranked <strong>#{me.rank ?? me.Rank}</strong> with <strong>{me.totalScore ?? me.TotalScore}</strong> points.
+                </span>
               </div>
             ) : null}
           </div>
