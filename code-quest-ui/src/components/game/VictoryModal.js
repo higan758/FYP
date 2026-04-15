@@ -53,8 +53,8 @@ export default function VictoryModal({
       >
         <div className={styles.victoryModalHeader}>
           <h2 className={styles.victoryModalTitle}>Quiz Result</h2>
-          <button type="button" className={styles.victoryModalClose} onClick={onClose}>
-            x
+          <button type="button" className={styles.victoryModalClose} onClick={onClose} aria-label="Close quiz result">
+            ×
           </button>
         </div>
 

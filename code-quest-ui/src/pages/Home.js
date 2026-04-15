@@ -1,42 +1,152 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
+import { http } from "../api/http";
+import { endpoints } from "../api/endpoints";
+import { computeStreakData, getMonthCalendar } from "../utils/streak";
 import styles from "../styles/home.module.css";
 
 export default function Home() {
   const { isAuthenticated } = useAuth();
+  const [attempts, setAttempts] = useState([]);
+  const [streakLoading, setStreakLoading] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    async function loadStreak() {
+      if (!isAuthenticated) {
+        setAttempts([]);
+        return;
+      }
+
+      setStreakLoading(true);
+      try {
+        const res = await http.get(endpoints.myAttempts);
+        if (!mounted) return;
+        setAttempts(Array.isArray(res) ? res : []);
+      } catch {
+        if (!mounted) return;
+        setAttempts([]);
+      } finally {
+        if (mounted) setStreakLoading(false);
+      }
+    }
+
+    loadStreak();
+    return () => {
+      mounted = false;
+    };
+  }, [isAuthenticated]);
+
+  const streak = useMemo(() => computeStreakData(attempts), [attempts]);
+  const calendar = useMemo(() => getMonthCalendar(new Date()), []);
+  const weekdayLabels = ["M", "T", "W", "T", "F", "S", "S"];
 
   return (
     <div className={styles.pageContainer}>
       {/* ── Hero ─────────────────────────────── */}
       <section className={styles.hero}>
         <div className={styles.heroInner}>
-          <span className={styles.heroEyebrow}>Interactive C# Learning Platform</span>
-          <h1 className={styles.heroTitle}>
-            Level Up Your C# Skills with{" "}
-            <span className={styles.heroTitleAccent}>CodeQuest</span>
-          </h1>
-          <p className={styles.heroSubtitle}>
-            Learn C# through interactive quests, battle-style quizzes, and a
-            global leaderboard — a playful, gamified way to master programming.
-          </p>
-          <div className={styles.heroCta}>
-            <Link to="/lessons" className="btn btn-primary btn-large">
-              Start Learning
-            </Link>
-            <Link to="/leaderboard" className="btn btn-secondary btn-large">
-              Leaderboard
-            </Link>
-            {isAuthenticated && (
-              <Link to="/profile" className="btn btn-outline btn-large">
-                Profile
-              </Link>
-            )}
-          </div>
-          <div className={styles.heroMeta}>
-            <span>Hands-on lessons</span>
-            <span>Battle quizzes</span>
-            <span>Live leaderboard</span>
+          <div className={styles.heroSplit}>
+            <div className={styles.heroMain}>
+              <span className={styles.heroEyebrow}>Interactive C# Learning Platform</span>
+              <h1 className={styles.heroTitle}>
+                Level Up Your C# Skills with{" "}
+                <span className={styles.heroTitleAccent}>CodeQuest</span>
+              </h1>
+              <p className={styles.heroSubtitle}>
+                Learn C# through interactive quests, battle-style quizzes, and a
+                global leaderboard - a playful, gamified way to master programming.
+              </p>
+              <div className={styles.heroCta}>
+                <Link to="/lessons" className="btn btn-primary btn-large">
+                  Start Learning
+                </Link>
+                <Link to="/leaderboard" className="btn btn-secondary btn-large">
+                  Leaderboard
+                </Link>
+                {isAuthenticated && (
+                  <Link to="/profile" className="btn btn-outline btn-large">
+                    Profile
+                  </Link>
+                )}
+              </div>
+              <div className={styles.heroMeta}>
+                <span>Hands-on lessons</span>
+                <span>Battle quizzes</span>
+                <span>Live leaderboard</span>
+              </div>
+            </div>
+
+            <aside className={styles.streakPanel}>
+              <div className={styles.streakPanelHeader}>
+                <h3>Learning Streak</h3>
+                {isAuthenticated && <span>{calendar.monthLabel}</span>}
+              </div>
+
+              {!isAuthenticated && (
+                <div className={styles.streakGuestState}>
+                  <p>Sign in to track your daily streak and fill your activity calendar.</p>
+                  <Link to="/login" className="btn btn-primary btn-small">Log In</Link>
+                </div>
+              )}
+
+              {isAuthenticated && streakLoading && (
+                <div className={styles.streakLoading}>Loading streak data...</div>
+              )}
+
+              {isAuthenticated && !streakLoading && (
+                <>
+                  <div className={styles.streakStatsRow}>
+                    <div className={styles.streakStatCard}>
+                      <div className={styles.streakStatValue}>{streak.currentStreak}</div>
+                      <div className={styles.streakStatLabel}>Current</div>
+                    </div>
+                    <div className={styles.streakStatCard}>
+                      <div className={styles.streakStatValue}>{streak.bestStreak}</div>
+                      <div className={styles.streakStatLabel}>Best</div>
+                    </div>
+                    <div className={styles.streakStatCard}>
+                      <div className={styles.streakStatValue}>{streak.monthActiveDateKeys.size}</div>
+                      <div className={styles.streakStatLabel}>This Month</div>
+                    </div>
+                  </div>
+
+                  <p className={styles.streakHint}>
+                    {streak.activeToday ? "Great work - today is marked complete." : "Complete a quiz today to keep your streak alive."}
+                  </p>
+
+                  <div className={styles.calendarWrap}>
+                    <div className={styles.calendarWeekRow}>
+                      {weekdayLabels.map((label, idx) => (
+                        <div key={`${label}-${idx}`} className={styles.calendarWeekCell}>{label}</div>
+                      ))}
+                    </div>
+                    <div className={styles.calendarGrid}>
+                      {calendar.cells.map((cell, idx) => {
+                        if (!cell) {
+                          return <div key={`empty-${idx}`} className={styles.calendarEmptyCell} />;
+                        }
+                        const isActive = streak.monthActiveDateKeys.has(cell.key);
+                        const className = [
+                          styles.calendarDayCell,
+                          isActive ? styles.calendarDayActive : "",
+                          cell.isToday ? styles.calendarDayToday : "",
+                        ].join(" ").trim();
+
+                        return (
+                          <div key={cell.key} className={className} title={isActive ? "Active day" : "No activity"}>
+                            {cell.day}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <Link to="/profile" className={styles.streakProfileLink}>View streak in profile</Link>
+                </>
+              )}
+            </aside>
           </div>
         </div>
       </section>

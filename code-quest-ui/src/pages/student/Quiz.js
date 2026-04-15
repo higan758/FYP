@@ -19,7 +19,6 @@ export default function Quiz() {
   const [selected, setSelected] = useState(null);
 
   const [submitting, setSubmitting] = useState(false);
-  const [result, setResult] = useState(null);
   const [showVictory, setShowVictory] = useState(false);
   const [resultData, setResultData] = useState(null);
   const [error, setError] = useState("");
@@ -227,7 +226,6 @@ export default function Quiz() {
       });
 
       pushBattleLog(rResult === "Victory" ? "Battle finished: Victory!" : "Battle finished: Defeat.");
-      setResult(res);
       setResultData({
         score: rScore,
         totalQuestions: rTotal,
@@ -292,13 +290,13 @@ export default function Quiz() {
 
   function restartQuiz() {
     setShowVictory(false);
-    setResult(null);
     setResultData(null);
     restartProgress();
   }
 
 
   const q = currentQuestion;
+  const progressPercent = Math.round(((currentIndex + 1) / Math.max(1, questions.length)) * 100);
 
   return (
     <div className="page container">
@@ -349,6 +347,13 @@ export default function Quiz() {
                 <h2>Question {currentIndex + 1} / {questions.length}</h2>
                 <span className="badge">Damage: {q.damage}</span>
               </div>
+              <div className={styles.progressMeta}>
+                <span>{progressPercent}% complete</span>
+                <span>{Math.max(0, questions.length - (currentIndex + 1))} remaining</span>
+              </div>
+              <div className={styles.progressTrack} aria-hidden="true">
+                <div className={styles.progressFill} style={{ width: `${progressPercent}%` }} />
+              </div>
               <p className={styles.question}>{q.text}</p>
               <div className={styles.damageMeta}>Choose an answer to deal damage.</div>
               <div className={styles.choices}>
@@ -358,7 +363,8 @@ export default function Quiz() {
                     onClick={() => choose(opt)}
                     className={`${styles.choiceBtn} ${selected === opt ? styles.selected : ""}`}
                   >
-                    {opt}: {q[`option${opt}`]}
+                    <span className={styles.choiceLabel}>{opt}</span>
+                    <span className={styles.choiceText}>{q[`option${opt}`]}</span>
                   </button>
                 ))}
               </div>

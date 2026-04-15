@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../auth/AuthContext";
 import { http } from "../api/http";
 import { endpoints } from "../api/endpoints";
+import { computeStreakData } from "../utils/streak";
 import styles from "../styles/profile.module.css";
 
 export default function Profile() {
@@ -15,6 +16,7 @@ export default function Profile() {
   const [rank, setRank] = useState(null);
   const [totalScore, setTotalScore] = useState(0);
   const [notification, setNotification] = useState("");
+  const [attempts, setAttempts] = useState([]);
 
   useEffect(() => {
     let mounted = true;
@@ -25,17 +27,29 @@ export default function Profile() {
         setMe(res);
         setUserNameDraft(res?.userName || user?.userName || "");
         try {
-          const [progressRes, lbRes] = await Promise.all([
+          const [progressResult, lbResult, attemptsResult] = await Promise.allSettled([
             http.get(endpoints.myProgress),
             http.get(`${endpoints.leaderboardTop}?limit=100`),
+            http.get(endpoints.myAttempts),
           ]);
           if (!mounted) return;
-          setProgressItems(Array.isArray(progressRes) ? progressRes : []);
-          // leaderboard returns { top: [...], me: { Rank, TotalScore } }
-          const myRank = lbRes?.me?.rank ?? lbRes?.me?.Rank ?? null;
-          const myScore = lbRes?.me?.totalScore ?? lbRes?.me?.TotalScore ?? 0;
-          setRank(myRank);
-          setTotalScore(myScore);
+
+          if (progressResult.status === "fulfilled") {
+            setProgressItems(Array.isArray(progressResult.value) ? progressResult.value : []);
+          }
+
+          if (lbResult.status === "fulfilled") {
+            const lbRes = lbResult.value;
+            // leaderboard returns { top: [...], me: { Rank, TotalScore } }
+            const myRank = lbRes?.me?.rank ?? lbRes?.me?.Rank ?? null;
+            const myScore = lbRes?.me?.totalScore ?? lbRes?.me?.TotalScore ?? 0;
+            setRank(myRank);
+            setTotalScore(myScore);
+          }
+
+          if (attemptsResult.status === "fulfilled") {
+            setAttempts(Array.isArray(attemptsResult.value) ? attemptsResult.value : []);
+          }
         } catch {}
       } catch (err) {
         setError(err.message || "Failed to load profile");
@@ -124,6 +138,8 @@ export default function Profile() {
     return Math.round((sum / withAttempts.length) * 100);
   }, [progressItems, quizzesCompleted, quizzesTotal]);
 
+  const streak = useMemo(() => computeStreakData(attempts), [attempts]);
+
   const rankLabel = rank === 1 ? "🥇 Champion" : rank === 2 ? "🥈 Silver" : rank === 3 ? "🥉 Bronze" : rank ? `#${rank}` : "—";
 
   if (loading) return <div className={styles.pageContainer}><div className={styles.loading}>Loading profile…</div></div>;
@@ -197,6 +213,10 @@ export default function Profile() {
               <span className={styles.statNumber}>{totalScore}</span>
               <span className={styles.statText}>Total XP</span>
             </div>
+            <div className={styles.statItem}>
+              <span className={styles.statNumber}>{streak.currentStreak}</span>
+              <span className={styles.statText}>Day Streak</span>
+            </div>
           </div>
 
           {/* Bio line */}
@@ -261,6 +281,10 @@ export default function Profile() {
             <div className={styles.miniStat}>
               <div className={styles.miniStatVal}>{rankLabel}</div>
               <div className={styles.miniStatLbl}>Rank</div>
+            </div>
+            <div className={styles.miniStat}>
+              <div className={styles.miniStatVal}>{streak.bestStreak}</div>
+              <div className={styles.miniStatLbl}>Best Streak</div>
             </div>
           </div>
         </div>

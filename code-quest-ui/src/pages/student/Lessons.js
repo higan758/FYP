@@ -2,12 +2,14 @@ import React, { useEffect, useMemo, useState } from "react";
 import { http } from "../../api/http";
 import { endpoints } from "../../api/endpoints";
 import LessonCard from "../../components/LessonCard";
+import { computeStreakData } from "../../utils/streak";
 import styles from "../../styles/lessons.module.css";
 
 export default function Lessons() {
   const [lessons, setLessons] = useState([]);
   const [unlocked, setUnlocked] = useState([]);
   const [progressItems, setProgressItems] = useState([]);
+  const [attempts, setAttempts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -16,10 +18,11 @@ export default function Lessons() {
 
     async function load() {
       try {
-        const [lessonsRes, unlockedRes, progressRes] = await Promise.all([
+        const [lessonsRes, unlockedRes, progressRes, attemptsRes] = await Promise.all([
           http.get(endpoints.lessons),
           http.get(endpoints.unlockedLessons),
           http.get(endpoints.myProgress),
+          http.get(endpoints.myAttempts),
         ]);
 
         if (!mounted) return;
@@ -27,6 +30,7 @@ export default function Lessons() {
         setLessons(Array.isArray(lessonsRes) ? lessonsRes : []);
         setUnlocked(Array.isArray(unlockedRes) ? unlockedRes : []);
         setProgressItems(Array.isArray(progressRes) ? progressRes : []);
+        setAttempts(Array.isArray(attemptsRes) ? attemptsRes : []);
       } catch (err) {
         setError(err.message || "Failed to load lessons");
       } finally {
@@ -122,6 +126,8 @@ export default function Lessons() {
     return Math.round((lessonStats.completed / lessonStats.total) * 100);
   }, [lessonStats]);
 
+  const streak = useMemo(() => computeStreakData(attempts), [attempts]);
+
   if (loading) return <div className={styles.loadingContainer}>Loading lessons…</div>;
   if (error) return <div className={styles.errorContainer}>{error}</div>;
 
@@ -130,34 +136,63 @@ export default function Lessons() {
       <div className={styles.overlay} />
 
       <div className={styles.header}>
-        <h1>C# Learning Path</h1>
-        <p>Master C# through interactive lessons and quizzes</p>
-        <div className={styles.progressOverview}>
-          <div className={styles.progressOverviewHead}>
-            <span>Your journey progress</span>
-            <strong>{completionPct}%</strong>
+        <div className={styles.headerSplit}>
+          <div className={styles.headerMain}>
+            <h1>C# Learning Path</h1>
+            <p>Master C# through interactive lessons and quizzes</p>
+            <div className={styles.progressOverview}>
+              <div className={styles.progressOverviewHead}>
+                <span>Your journey progress</span>
+                <strong>{completionPct}%</strong>
+              </div>
+              <div className={styles.progressOverviewTrack}>
+                <div className={styles.progressOverviewFill} style={{ width: `${completionPct}%` }} />
+              </div>
+            </div>
+            <div className={styles.summaryRow}>
+              <div className={styles.summaryChip}>
+                <span className={styles.summaryValue}>{lessonStats.completed}</span>
+                <span className={styles.summaryLabel}>Completed</span>
+              </div>
+              <div className={styles.summaryChip}>
+                <span className={styles.summaryValue}>{lessonStats.unlockedOnly}</span>
+                <span className={styles.summaryLabel}>Unlocked</span>
+              </div>
+              <div className={styles.summaryChip}>
+                <span className={styles.summaryValue}>{lessonStats.locked}</span>
+                <span className={styles.summaryLabel}>Locked</span>
+              </div>
+              <div className={styles.summaryChip}>
+                <span className={styles.summaryValue}>{lessonStats.total}</span>
+                <span className={styles.summaryLabel}>Total Lessons</span>
+              </div>
+            </div>
           </div>
-          <div className={styles.progressOverviewTrack}>
-            <div className={styles.progressOverviewFill} style={{ width: `${completionPct}%` }} />
-          </div>
-        </div>
-        <div className={styles.summaryRow}>
-          <div className={styles.summaryChip}>
-            <span className={styles.summaryValue}>{lessonStats.completed}</span>
-            <span className={styles.summaryLabel}>Completed</span>
-          </div>
-          <div className={styles.summaryChip}>
-            <span className={styles.summaryValue}>{lessonStats.unlockedOnly}</span>
-            <span className={styles.summaryLabel}>Unlocked</span>
-          </div>
-          <div className={styles.summaryChip}>
-            <span className={styles.summaryValue}>{lessonStats.locked}</span>
-            <span className={styles.summaryLabel}>Locked</span>
-          </div>
-          <div className={styles.summaryChip}>
-            <span className={styles.summaryValue}>{lessonStats.total}</span>
-            <span className={styles.summaryLabel}>Total Lessons</span>
-          </div>
+
+          <aside className={styles.streakPanel}>
+            <div className={styles.streakPanelHeader}>
+              <h3>Streak Counter</h3>
+            </div>
+
+            <div className={styles.streakStatsRow}>
+              <div className={styles.streakStatCard}>
+                <div className={styles.streakStatValue}>{streak.currentStreak}</div>
+                <div className={styles.streakStatLabel}>Current</div>
+              </div>
+              <div className={styles.streakStatCard}>
+                <div className={styles.streakStatValue}>{streak.bestStreak}</div>
+                <div className={styles.streakStatLabel}>Best</div>
+              </div>
+              <div className={styles.streakStatCard}>
+                <div className={styles.streakStatValue}>{streak.monthActiveDateKeys.size}</div>
+                <div className={styles.streakStatLabel}>This Month</div>
+              </div>
+            </div>
+
+            <p className={styles.streakHint}>
+              {streak.activeToday ? "You are on track today." : "Finish a quiz today to keep your streak alive."}
+            </p>
+          </aside>
         </div>
       </div>
 

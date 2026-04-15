@@ -6,6 +6,7 @@ export const endpoints = {
   quizzes: "/api/quizzes",
   questions: "/api/questions",
   submitAttempt: "/api/attempts/submit",
+  myAttempts: "/api/attempts/my",
 
   myProgress: "/api/progress/my",
   unlockedLessons: "/api/progress/unlocked",
