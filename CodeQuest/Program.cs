@@ -1,5 +1,4 @@
 using CodeQuest.Data;
-using CodeQuest.Data.Interfaces;
 using CodeQuest.Data.Repositories;
 using CodeQuest.Services;
 using CodeQuest.Services.Auth;

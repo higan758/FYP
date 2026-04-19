@@ -121,6 +121,14 @@ export default function Quiz() {
     setBattleLog(prev => [...prev, message]);
   }
 
+  function resolveCorrectAnswerLetter(question, check) {
+    const fromCheck = check?.correctAnswer ?? check?.CorrectAnswer ?? check?.answer ?? check?.Answer;
+    const fromQuestion = question?.correctAnswer ?? question?.CorrectAnswer ?? question?.correctOption ?? question?.CorrectOption;
+    const value = (fromCheck ?? fromQuestion ?? "").toString().trim().toUpperCase();
+    if (["A", "B", "C", "D"].includes(value)) return value;
+    return "";
+  }
+
   function choose(option) {
     setSelected(option);
     saveProgress({ selected: option });
@@ -142,6 +150,12 @@ export default function Quiz() {
       setPlayerHp(hp => Math.max(0, hp - toPlayer));
       emitBattleEvent(check, toEnemy, toPlayer);
       pushBattleLog(`Q${currentIndex + 1}: ${correct ? "Correct" : "Wrong"}.`);
+      if (!correct) {
+        const correctAnswer = resolveCorrectAnswerLetter(q, check);
+        if (correctAnswer) {
+          pushBattleLog(`Correct answer: ${correctAnswer}.`);
+        }
+      }
       if (toEnemy > 0) pushBattleLog(`You dealt ${toEnemy} damage to Slime.`);
       if (toPlayer > 0) pushBattleLog(`Slime dealt ${toPlayer} damage to you.`);
       setLastEnemyHit(toEnemy);
@@ -180,6 +194,12 @@ export default function Quiz() {
           setPlayerHp(hp => Math.max(0, hp - toPlayer));
           emitBattleEvent(check, toEnemy, toPlayer);
           pushBattleLog(`Q${currentIndex + 1}: ${correct ? "Correct" : "Wrong"}.`);
+          if (!correct) {
+            const correctAnswer = resolveCorrectAnswerLetter(q, check);
+            if (correctAnswer) {
+              pushBattleLog(`Correct answer: ${correctAnswer}.`);
+            }
+          }
           if (toEnemy > 0) pushBattleLog(`You dealt ${toEnemy} damage to Slime.`);
           if (toPlayer > 0) pushBattleLog(`Slime dealt ${toPlayer} damage to you.`);
           setLastEnemyHit(toEnemy);

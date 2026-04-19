@@ -1,5 +1,5 @@
 using CodeQuest.Data.Entities;
-using CodeQuest.Data.Interfaces;
+using CodeQuest.Data.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

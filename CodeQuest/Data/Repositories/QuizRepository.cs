@@ -1,5 +1,4 @@
 ﻿using CodeQuest.Data.Entities;
-using CodeQuest.Data.Interfaces;
 
 namespace CodeQuest.Data.Repositories;
 

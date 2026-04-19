@@ -1,6 +1,6 @@
 using CodeQuest.Data.Entities;
 
-namespace CodeQuest.Data.Interfaces;
+namespace CodeQuest.Data.Repositories;
 
 public interface IQuestionRepository
 {

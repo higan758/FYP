@@ -1,7 +1,7 @@
 using CodeQuest.Data.Entities;
-using CodeQuest.Data.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using CodeQuest.Data.Repositories;
 
 namespace CodeQuest.Controllers;
 
