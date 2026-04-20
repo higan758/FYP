@@ -18,10 +18,31 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterUserDto dto)
     {
+        if (!ModelState.IsValid)
+        {
+            return ValidationProblem(new ValidationProblemDetails(ModelState)
+            {
+                Title = "Validation failed",
+                Detail = "One or more validation errors occurred.",
+                Status = StatusCodes.Status400BadRequest
+            });
+        }
+
         try
         {
             var result = await _authService.RegisterAsync(dto);
             return Ok(result);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new
+            {
+                message = "Validation failed",
+                errors = new Dictionary<string, string[]>
+                {
+                    { "Email", new[] { ex.Message } }
+                }
+            });
         }
         catch (Exception ex)
         {

@@ -2,9 +2,11 @@ import React, { useState } from "react";
 
 export default function PasswordInput({
   label,
+  name,
   value,
   onChange,
   autoComplete,
+  error,
 }) {
   const [show, setShow] = useState(false);
 
@@ -14,10 +16,13 @@ export default function PasswordInput({
 
       <div className="password-wrap">
         <input
+          name={name}
           type={show ? "text" : "password"}
           value={value}
           onChange={onChange}
           autoComplete={autoComplete}
+          className={error ? "auth-input-error" : ""}
+          aria-invalid={!!error}
         />
 
         <button
@@ -42,6 +47,7 @@ export default function PasswordInput({
           )}
         </button>
       </div>
+      {error ? <div className="auth-field-error">{error}</div> : null}
     </div>
   );
 }

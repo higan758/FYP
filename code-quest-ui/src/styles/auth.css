@@ -71,6 +71,20 @@
   box-shadow: 0 0 0 3px var(--color-primary-light);
 }
 
+.auth-field .auth-input-error {
+  border-color: var(--color-danger);
+}
+
+.auth-field .auth-input-error:focus {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+}
+
+.auth-field-error {
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+}
+
 .auth-actions {
   display: flex;
   gap: var(--space-md);

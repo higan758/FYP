@@ -25,14 +25,18 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponseDto> RegisterAsync(RegisterUserDto dto)
     {
-        if (await _context.Users.AnyAsync(u => u.Email == dto.Email))
-            throw new Exception("Email already exists");
+        var normalizedEmail = (dto.Email ?? string.Empty).Trim().ToLowerInvariant();
+        var normalizedUserName = (dto.UserName ?? string.Empty).Trim();
+        var normalizedFullName = (dto.FullName ?? string.Empty).Trim();
+
+        if (await _context.Users.AnyAsync(u => u.Email.ToLower() == normalizedEmail))
+            throw new InvalidOperationException("Email already exists");
 
         var user = new User
         {
-            FullName = dto.FullName,
-            UserName = dto.UserName,
-            Email = dto.Email,
+            FullName = normalizedFullName,
+            UserName = normalizedUserName,
+            Email = normalizedEmail,
             Role = "Student",
             IsActive = true
         };
@@ -42,7 +46,7 @@ public class AuthService : IAuthService
             user.Role = "Admin";
         }
 
-        user.PasswordHash = _passwordHasher.HashPassword(user, dto.Password);
+        user.PasswordHash = _passwordHasher.HashPassword(user, dto.Password.Trim());
 
         _context.Users.Add(user);
         await _context.SaveChangesAsync();

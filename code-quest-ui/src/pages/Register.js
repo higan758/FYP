@@ -9,27 +9,106 @@ export default function Register() {
   const { register } = useAuth();
   const nav = useNavigate();
 
-  const [fullName, setFullName] = useState("");
-  const [userName, setUserName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({
+    fullName: "",
+    userName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [errors, setErrors] = useState({});
   const [err, setErr] = useState("");
+
+  function validateForm(nextFormData) {
+    const validationErrors = {};
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!nextFormData.userName) {
+      validationErrors.userName = "Username is required.";
+    }
+
+    if (!nextFormData.email) {
+      validationErrors.email = "Email is required.";
+    } else if (!emailRegex.test(nextFormData.email)) {
+      validationErrors.email = "Please enter a valid email address.";
+    }
+
+    if (!nextFormData.password) {
+      validationErrors.password = "Password is required.";
+    } else if (nextFormData.password.length < 6) {
+      validationErrors.password = "Password must be at least 6 characters.";
+    }
+
+    if (!nextFormData.confirmPassword) {
+      validationErrors.confirmPassword = "Confirm password is required.";
+    } else if (nextFormData.password !== nextFormData.confirmPassword) {
+      validationErrors.confirmPassword = "Passwords do not match.";
+    }
+
+    setErrors(validationErrors);
+    return Object.keys(validationErrors).length === 0;
+  }
+
+  function handleChange(e) {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    setErrors((prev) => {
+      if (!prev[name]) {
+        return prev;
+      }
+      const next = { ...prev };
+      delete next[name];
+      return next;
+    });
+  }
 
   async function onSubmit(e) {
     e.preventDefault();
     setErr("");
 
+    const trimmedFormData = {
+      fullName: formData.fullName.trim(),
+      userName: formData.userName.trim(),
+      email: formData.email.trim(),
+      password: formData.password.trim(),
+      confirmPassword: formData.confirmPassword.trim(),
+    };
+
+    setFormData(trimmedFormData);
+
+    if (!validateForm(trimmedFormData)) {
+      return;
+    }
+
     try {
       await register({
-        fullName,
-        userName,
-        email,
-        password,
+        fullName: trimmedFormData.fullName,
+        userName: trimmedFormData.userName,
+        email: trimmedFormData.email,
+        password: trimmedFormData.password,
+        confirmPassword: trimmedFormData.confirmPassword,
       });
 
       nav("/login");
     } catch (ex) {
-      setErr(ex.message);
+      const backendErrors = ex?.data?.errors;
+      if (backendErrors && typeof backendErrors === "object") {
+        const nextErrors = {};
+        Object.entries(backendErrors).forEach(([field, messages]) => {
+          if (Array.isArray(messages) && messages.length > 0) {
+            const key = field.charAt(0).toLowerCase() + field.slice(1);
+            nextErrors[key] = messages[0];
+          }
+        });
+        if (Object.keys(nextErrors).length > 0) {
+          setErrors(nextErrors);
+        }
+      }
+      setErr(ex.message || "Registration failed. Please fix the errors and try again.");
     }
   }
 
@@ -52,28 +131,54 @@ export default function Register() {
         <form onSubmit={onSubmit}>
           <div className="auth-field">
             <label>Full Name</label>
-            <input value={fullName} onChange={(e) => setFullName(e.target.value)} />
+            <input
+              name="fullName"
+              value={formData.fullName}
+              onChange={handleChange}
+            />
           </div>
 
           <div className="auth-field">
             <label>Username</label>
-            <input value={userName} onChange={(e) => setUserName(e.target.value)} />
+            <input
+              name="userName"
+              value={formData.userName}
+              onChange={handleChange}
+              className={errors.userName ? "auth-input-error" : ""}
+              aria-invalid={!!errors.userName}
+            />
+            {errors.userName ? <div className="auth-field-error">{errors.userName}</div> : null}
           </div>
 
           <div className="auth-field">
             <label>Email</label>
             <input
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
               autoComplete="email"
+              className={errors.email ? "auth-input-error" : ""}
+              aria-invalid={!!errors.email}
             />
+            {errors.email ? <div className="auth-field-error">{errors.email}</div> : null}
           </div>
 
           <PasswordInput
             label="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
             autoComplete="new-password"
+            error={errors.password}
+          />
+
+          <PasswordInput
+            label="Confirm Password"
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            autoComplete="new-password"
+            error={errors.confirmPassword}
           />
 
           <div className="auth-actions">
