@@ -28,7 +28,7 @@ namespace CodeQuest.Controllers.Admin
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateQuestionDto dto)
+        public async Task<IActionResult> Create([FromBody] AdminQuestionDto dto)
         {
             if (dto.QuizId == Guid.Empty)
                 return BadRequest("QuizId is required");
@@ -91,7 +91,7 @@ namespace CodeQuest.Controllers.Admin
         }
     }
 
-    public class CreateQuestionDto
+    public class AdminQuestionDto
     {
         public Guid QuizId { get; set; }
         public string Text { get; set; } = string.Empty;
