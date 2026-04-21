@@ -1,9 +1,11 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { http } from "../../api/http";
 import { endpoints } from "../../api/endpoints";
+import { useAuth } from "../../auth/AuthContext";
 import styles from "../../styles/adminDashboard.module.css";
 
 export default function AdminDashboard() {
+  const { user } = useAuth();
   const [stats, setStats] = useState({
     usersCount: 0,
     lessonsCount: 0,
@@ -38,9 +40,12 @@ export default function AdminDashboard() {
     load();
   }, [load]);
 
+  const adminDisplayName = user?.userName || user?.email || "Unknown admin";
+
   return (
     <div>
       <h1>Admin Dashboard</h1>
+      <p><strong>Logged in as:</strong> {adminDisplayName}</p>
       
       {error && <div className={styles.error}>{error}</div>}
 

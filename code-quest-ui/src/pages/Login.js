@@ -1,13 +1,55 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
+import { tokenStorage } from "../auth/tokenStorage";
 import PasswordInput from "../components/PasswordInput";
 import GoogleLoginButton from "../components/GoogleLoginButton";
 import "../styles/auth.css";
 import Toast from "../components/Toast";
 
+function base64UrlDecode(str) {
+  try {
+    const pad = (s) => s + "=".repeat((4 - (s.length % 4)) % 4);
+    const s = pad(str.replace(/-/g, "+").replace(/_/g, "/"));
+    const decoded = atob(s);
+    try {
+      return decodeURIComponent(
+        decoded.split("").map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2)).join("")
+      );
+    } catch {
+      return decoded;
+    }
+  } catch {
+    return "";
+  }
+}
+
+function parseJwt(token) {
+  try {
+    const [, payload] = token.split(".");
+    if (!payload) return null;
+    const json = base64UrlDecode(payload);
+    return JSON.parse(json);
+  } catch {
+    return null;
+  }
+}
+
+function getRoleFromClaims(claims) {
+  const c = claims || {};
+  return c.role || c["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || null;
+}
+
+function isAdminFromStoredToken() {
+  const token = tokenStorage.get();
+  if (!token) return false;
+  const claims = parseJwt(token);
+  const role = getRoleFromClaims(claims);
+  return (role || "").toLowerCase() === "admin";
+}
+
 export default function Login() {
-  const { login, isAdmin } = useAuth();
+  const { login } = useAuth();
   const nav = useNavigate();
 
   const [emailOrUsername, setEmailOrUsername] = useState("");
@@ -26,10 +68,12 @@ export default function Login() {
         password,
       });
 
-      setToastMsg(isAdmin ? "You have logged in as Admin" : "You have logged in");
+      const loggedInAsAdmin = isAdminFromStoredToken();
+
+      setToastMsg(loggedInAsAdmin ? "You have logged in as Admin" : "You have logged in");
       setTimeout(() => {
         setToastMsg("");
-        nav(isAdmin ? "/admin" : "/lessons");
+        nav(loggedInAsAdmin ? "/admin" : "/lessons");
       }, 1200);
     } catch (ex) {
       setErr(ex.message);
@@ -37,10 +81,11 @@ export default function Login() {
   }
 
   function handleGoogleSuccess() {
-    setToastMsg("Logged in with Google");
+    const loggedInAsAdmin = isAdminFromStoredToken();
+    setToastMsg(loggedInAsAdmin ? "You have logged in as Admin" : "Logged in with Google");
     setTimeout(() => {
       setToastMsg("");
-      nav("/lessons");
+      nav(loggedInAsAdmin ? "/admin" : "/lessons");
     }, 1200);
   }
 
