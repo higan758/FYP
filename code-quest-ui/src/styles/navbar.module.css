@@ -12,10 +12,11 @@
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 var(--space-lg);
-  height: 70px;
+  min-height: 70px;
   display: flex;
   align-items: center;
   gap: var(--space-lg);
+  row-gap: var(--space-sm);
 }
 
 .logo {
@@ -57,6 +58,7 @@
   gap: var(--space-sm);
   align-items: center;
   flex-wrap: wrap;
+  min-width: 0;
 }
 
 .link {
@@ -109,9 +111,8 @@
 
 @media (max-width: 768px) {
   .container {
-    padding: 0 var(--space-md);
+    padding: var(--space-sm) var(--space-md);
     gap: var(--space-md);
-    min-height: auto;
     flex-wrap: wrap;
   }
 
@@ -130,17 +131,32 @@
   .links {
     flex-basis: 100%;
     gap: var(--space-xs);
+    justify-content: flex-start;
   }
 
   .link {
     padding: var(--space-sm) var(--space-md);
     font-size: var(--font-size-sm);
-    flex: 1;
+    flex: 1 1 calc(50% - var(--space-xs));
     text-align: center;
   }
 
   .logoutBtn {
     flex-basis: 100%;
     text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: var(--space-xs) var(--space-sm);
+  }
+
+  .logoText {
+    font-size: 1rem;
+  }
+
+  .link {
+    flex-basis: 100%;
   }
 }

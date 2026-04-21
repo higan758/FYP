@@ -53,6 +53,7 @@
 .auth-field input,
 .auth-field textarea,
 .auth-field select {
+  width: 100%;
   padding: var(--space-md);
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-border);
@@ -89,11 +90,18 @@
   display: flex;
   gap: var(--space-md);
   align-items: center;
+  flex-wrap: wrap;
   margin-top: var(--space-lg);
 }
 
 .auth-actions button {
-  flex: 1;
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.auth-actions span {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .auth-error {
@@ -201,5 +209,20 @@
   .auth-actions {
     flex-direction: column;
     align-items: stretch;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-page {
+    padding: var(--space-sm);
+  }
+
+  .auth-wrap {
+    padding: var(--space-md);
+    border-radius: var(--radius-xl);
+  }
+
+  .auth-wrap h1 {
+    font-size: var(--font-size-xl);
   }
 }
